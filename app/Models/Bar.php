@@ -47,6 +47,64 @@ class Bar extends Model
             ->withTimestamps();
     }
 
+    public function billingUser(): ?User
+    {
+        $owner = $this->users()->wherePivot('role', 'owner')->first();
+
+        return $owner ?: $this->users()->first();
+    }
+
+    public function subscriptionName(): string
+    {
+        return "bar-{$this->id}";
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        $billingUser = $this->billingUser();
+        if (! $billingUser) {
+            return false;
+        }
+
+        return $billingUser->hasActiveSubscription($this->subscriptionName());
+    }
+
+    public function hasActiveAccess(): bool
+    {
+        if ($this->is_demo) {
+            return true;
+        }
+
+        if ($this->hasActiveSubscription()) {
+            return true;
+        }
+
+        $billingUser = $this->billingUser();
+        if (! $billingUser) {
+            return false;
+        }
+
+        return $billingUser->hasActiveTrial();
+    }
+
+    public function subscriptionStatus(): string
+    {
+        if ($this->is_demo) {
+            return 'active';
+        }
+
+        if ($this->hasActiveSubscription()) {
+            return 'active';
+        }
+
+        $billingUser = $this->billingUser();
+        if ($billingUser && $billingUser->hasActiveTrial()) {
+            return 'trial';
+        }
+
+        return 'inactive';
+    }
+
     /**
      * Get the beers for this bar.
      */

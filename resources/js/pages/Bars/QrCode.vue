@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ArrowLeft, Download, Copy, CheckCircle2, QrCode as QrCodeIcon, Sparkles } from 'lucide-vue-next';
+import { ArrowLeft, Download, Copy, CheckCircle2, QrCode as QrCodeIcon, Sparkles, CreditCard, AlertCircle } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 interface Props {
     bar: {
@@ -22,10 +22,17 @@ interface Props {
         includeLogo: boolean;
         logoAvailable: boolean;
     };
+    subscription: {
+        status: 'active' | 'trial' | 'inactive';
+        trialEndsAt?: string | null;
+        canDownload: boolean;
+    };
 }
 
 const props = defineProps<Props>();
 const copied = ref(false);
+const qrEnabled = ref(props.bar.qr_enabled);
+const isUpdatingQr = ref(false);
 
 const selectedFrame = ref(props.qrOptions.frame ?? 'none');
 const includeLogo = ref(props.qrOptions.includeLogo);
@@ -47,6 +54,10 @@ const applyOptions = () => {
 };
 
 const downloadQrCode = () => {
+    if (!props.subscription.canDownload) {
+        return;
+    }
+
     const style = selectedFrame.value === 'none' ? 'simple' : 'framed';
     const params = new URLSearchParams();
     params.set('style', style);
@@ -69,6 +80,37 @@ const copyUrl = async () => {
         copied.value = false;
     }, 2000);
 };
+
+const startSubscription = () => {
+    router.post(`/bars/${props.bar.slug}/subscription/checkout`, {}, { preserveScroll: true });
+};
+
+const toggleQrEnabled = () => {
+    const nextValue = qrEnabled.value;
+    isUpdatingQr.value = true;
+
+    router.put(
+        `/bars/${props.bar.slug}/qr-code/status`,
+        { qr_enabled: nextValue },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onError: () => {
+                qrEnabled.value = !nextValue;
+            },
+            onFinish: () => {
+                isUpdatingQr.value = false;
+            },
+        }
+    );
+};
+
+watch(
+    () => props.bar.qr_enabled,
+    (value) => {
+        qrEnabled.value = value;
+    }
+);
 </script>
 
 <template>
@@ -101,41 +143,95 @@ const copyUrl = async () => {
                 </div>
 
                 <div class="space-y-6">
-
-                    <!-- URL Card -->
-                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 to-amber-800 p-8 shadow-xl">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <label class="text-lg font-semibold text-white">URL publique</label>
-                                    <span class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
-                                        Partage instantané
-                                    </span>
-                                </div>
-                                <p class="mt-1 text-sm text-amber-100">Partagez cette URL ou le QR code avec vos clients</p>
-                                <div class="mt-4 flex gap-2">
-                                    <input
-                                        :value="publicUrl"
-                                        readonly
-                                        class="flex-1 rounded-lg border-0 bg-white/20 px-4 py-2.5 font-mono text-sm text-white placeholder:text-amber-100 backdrop-blur-sm focus:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
-                                    />
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-amber-700 shadow-sm transition-colors hover:bg-amber-50"
-                                        @click="copyUrl"
-                                    >
-                                        <Copy v-if="!copied" class="h-4 w-4" />
-                                        <CheckCircle2 v-else class="h-4 w-4 text-green-600" />
-                                        <span>{{ copied ? 'Copié !' : 'Copier' }}</span>
-                                    </button>
-                                </div>
+                    <div v-if="subscription.status !== 'active'" class="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-2 text-sm font-medium text-amber-800">
+                                <AlertCircle class="h-5 w-5 text-amber-700" />
+                                <span v-if="subscription.status === 'trial'">Essai en cours · Pensez a activer l'abonnement.</span>
+                                <span v-else>Abonnement inactif · Le telechargement est bloque.</span>
                             </div>
+                            <button
+                                type="button"
+                                class="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-amber-700"
+                                @click="startSubscription"
+                            >
+                                <CreditCard class="h-4 w-4" />
+                                Activer l'abonnement
+                            </button>
                         </div>
-                        <div class="pointer-events-none absolute right-0 top-0 h-48 w-48 -translate-y-12 translate-x-12 rounded-full bg-white/10 blur-3xl"></div>
-                        <div class="pointer-events-none absolute -bottom-16 left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
                     </div>
 
-                                     <!-- Options -->
+                    <div class="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
+                        <!-- URL Card -->
+                        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 to-amber-800 p-8 shadow-xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <label class="text-lg font-semibold text-white">URL publique</label>
+                                        <span class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
+                                            Partage instantané
+                                        </span>
+                                    </div>
+                                    <p class="mt-1 text-sm text-amber-100">Partagez cette URL ou le QR code avec vos clients</p>
+                                    <div class="mt-4 flex gap-2">
+                                        <input
+                                            :value="publicUrl"
+                                            readonly
+                                            class="flex-1 rounded-lg border-0 bg-white/20 px-4 py-2.5 font-mono text-sm text-white placeholder:text-amber-100 backdrop-blur-sm focus:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                        />
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-amber-700 shadow-sm transition-colors hover:bg-amber-50"
+                                            @click="copyUrl"
+                                        >
+                                            <Copy v-if="!copied" class="h-4 w-4" />
+                                            <CheckCircle2 v-else class="h-4 w-4 text-green-600" />
+                                            <span>{{ copied ? 'Copié !' : 'Copier' }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pointer-events-none absolute right-0 top-0 h-48 w-48 -translate-y-12 translate-x-12 rounded-full bg-white/10 blur-3xl"></div>
+                            <div class="pointer-events-none absolute -bottom-16 left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
+                        </div>
+
+                        <!-- Status Toggle -->
+                        <div v-if="!bar.is_demo" class="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
+                            <div class="flex items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-900">Statut du QR code</h3>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {{ qrEnabled ? 'Le QR code est actif et accessible' : 'Le QR code est désactivé' }}
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span
+                                        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
+                                        :class="qrEnabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                    >
+                                        {{ qrEnabled ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                    <label class="relative inline-flex cursor-pointer items-center">
+                                        <input
+                                            v-model="qrEnabled"
+                                            type="checkbox"
+                                            class="peer sr-only"
+                                            :disabled="isUpdatingQr"
+                                            @change="toggleQrEnabled"
+                                        />
+                                        <div
+                                            class="h-6 w-11 rounded-full bg-gray-200 peer peer-checked:bg-amber-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
+                                        ></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-xs text-gray-500">
+                                Activez ou désactivez l'accès client sans quitter cette page.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Options -->
                     <div class="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
                         <div class="flex items-center justify-between">
                             <div>
@@ -237,7 +333,8 @@ const copyUrl = async () => {
                     <div class="flex justify-center">
                         <button
                             type="button"
-                            class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl"
+                            class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
+                            :disabled="!subscription.canDownload"
                             @click="downloadQrCode"
                         >
                             <Download class="h-5 w-5" />
@@ -245,28 +342,6 @@ const copyUrl = async () => {
                         </button>
                     </div>
 
-                    <!-- Status Toggle -->
-                    <div v-if="!bar.is_demo" class="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-900">Statut du QR code</h3>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    {{ bar.qr_enabled ? 'Le QR code est actif et accessible' : 'Le QR code est désactivé' }}
-                                </p>
-                            </div>
-                            <div class="flex items-center">
-                                <span
-                                    class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
-                                    :class="bar.qr_enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                >
-                                    {{ bar.qr_enabled ? 'Actif' : 'Inactif' }}
-                                </span>
-                            </div>
-                        </div>
-                        <p class="mt-4 text-xs text-gray-500">
-                            Pour modifier le statut, rendez-vous dans les paramètres du bar.
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>

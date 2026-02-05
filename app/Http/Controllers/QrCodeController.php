@@ -8,6 +8,7 @@ use BaconQrCode\Renderer\ImageRendererInterface;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +25,9 @@ class QrCodeController extends Controller
         $this->authorize('view', $bar);
 
         $publicUrl = $bar->public_url;
+        $subscriptionStatus = $bar->subscriptionStatus();
+        $billingUser = $bar->billingUser();
+        $trialEndsAt = $subscriptionStatus === 'trial' ? $billingUser?->trial_ends_at : null;
         $frames = $this->availableFrames();
         $defaultFrame = $frames[0]['id'] ?? null;
         $style = $request->string('style')->toString() ?: 'simple';
@@ -60,6 +64,11 @@ class QrCodeController extends Controller
                 'includeLogo' => $includeLogo,
                 'logoAvailable' => $logoAvailable,
             ],
+            'subscription' => [
+                'status' => $subscriptionStatus,
+                'trialEndsAt' => $trialEndsAt?->toDateString(),
+                'canDownload' => $bar->hasActiveAccess(),
+            ],
         ]);
     }
 
@@ -69,6 +78,10 @@ class QrCodeController extends Controller
     public function download(Request $request, Bar $bar): HttpResponse
     {
         $this->authorize('view', $bar);
+
+        if (! $bar->hasActiveAccess()) {
+            abort(403);
+        }
 
         $publicUrl = $bar->public_url;
         $frames = $this->availableFrames();
@@ -100,6 +113,24 @@ class QrCodeController extends Controller
             'Content-Type' => 'image/svg+xml',
             'Content-Disposition' => "attachment; filename=\"qr-code-{$bar->slug}.svg\"",
         ]);
+    }
+
+    /**
+     * Update the QR code availability.
+     */
+    public function updateStatus(Request $request, Bar $bar): RedirectResponse
+    {
+        $this->authorize('updateSettings', $bar);
+
+        $data = $request->validate([
+            'qr_enabled' => ['required', 'boolean'],
+        ]);
+
+        $bar->update([
+            'qr_enabled' => $data['qr_enabled'],
+        ]);
+
+        return redirect()->back();
     }
 
     private function buildQrCodeSvg(

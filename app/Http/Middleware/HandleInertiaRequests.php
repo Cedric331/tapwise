@@ -36,6 +36,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $currentBarModel = null;
         $shared = [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -49,6 +50,7 @@ class HandleInertiaRequests extends Middleware
         if ($request->route() && $request->route()->hasParameter('bar')) {
             $bar = $request->route()->parameter('bar');
             if ($bar instanceof Bar) {
+                $currentBarModel = $bar;
                 $shared['currentBar'] = [
                     'id' => $bar->id,
                     'name' => $bar->name,
@@ -66,6 +68,7 @@ class HandleInertiaRequests extends Middleware
             if ($barId) {
                 $bar = Bar::find($barId);
                 if ($bar && $bar->canBeAccessedBy($request->user())) {
+                    $currentBarModel = $bar;
                     $shared['currentBar'] = [
                         'id' => $bar->id,
                         'name' => $bar->name,
@@ -83,6 +86,22 @@ class HandleInertiaRequests extends Middleware
                 ->select('id', 'name', 'slug')
                 ->orderBy('name')
                 ->get();
+        }
+
+        if ($currentBarModel) {
+            $subscriptionStatus = $currentBarModel->subscriptionStatus();
+            $trialDaysLeft = null;
+            if ($subscriptionStatus === 'trial') {
+                $trialEndsAt = $currentBarModel->billingUser()?->trial_ends_at;
+                if ($trialEndsAt) {
+                    $trialDaysLeft = max(now()->diffInDays($trialEndsAt, false), 0);
+                }
+            }
+
+            $shared['currentBarSubscription'] = [
+                'status' => $subscriptionStatus,
+                'trialDaysLeft' => $trialDaysLeft,
+            ];
         }
 
         return $shared;

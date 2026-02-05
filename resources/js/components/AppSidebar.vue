@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { BookOpen, Folder, Beer, LayoutGrid, Store, ChevronDown } from 'lucide-vue-next';
+import { BookOpen, Folder, Beer, LayoutGrid, Store, ChevronDown, CreditCard, AlertCircle } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -28,6 +28,12 @@ import AppLogoIcon from './AppLogoIcon.vue';
 
 const page = usePage();
 const currentBar = computed(() => (page.props as any).currentBar as { id: number; name: string; slug: string } | undefined);
+const currentBarSubscription = computed(
+    () =>
+        (page.props as any).currentBarSubscription as
+            | { status: 'active' | 'trial' | 'inactive'; trialDaysLeft: number | null }
+            | undefined
+);
 const bars = computed(() => ((page.props as any).bars ?? []) as Array<{ id: number; name: string; slug: string }>);
 
 const barLabel = computed(() => currentBar.value?.name ?? 'Sélectionner un bar');
@@ -55,8 +61,20 @@ const mainNavItems = computed<NavItem[]>(() => {
 });
 
 const footerNavItems: NavItem[] = [
-
+    {
+        title: 'Gerer mon abonnement',
+        href: currentBar.value ? `/bars/${currentBar.value.slug}/subscription/portal` : '/bars',
+        icon: CreditCard,
+    },
 ];
+
+const startSubscription = () => {
+    if (!currentBar.value) {
+        return;
+    }
+
+    router.post(`/bars/${currentBar.value.slug}/subscription/checkout`, {}, { preserveScroll: true });
+};
 </script>
 
 <template>
@@ -136,6 +154,32 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
+            <div
+                v-if="currentBarSubscription && currentBarSubscription.status !== 'active'"
+                class="mx-3 mb-3 rounded-xl border border-amber-100 bg-amber-50/70 px-3 py-3 text-xs font-medium text-amber-900"
+            >
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-start gap-2">
+                        <AlertCircle class="mt-0.5 h-4 w-4 text-amber-700" />
+                        <div>
+                            <p v-if="currentBarSubscription.status === 'trial'">
+                                Essai en cours
+                                <span v-if="currentBarSubscription.trialDaysLeft !== null">
+                                    · {{ currentBarSubscription.trialDaysLeft }}j restants
+                                </span>
+                            </p>
+                            <p v-else>Abonnement inactif</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        class="inline-flex items-center cursor-pointer rounded-lg bg-white px-2.5 py-1 text-[11px] font-semibold text-amber-800 shadow-sm transition-colors hover:bg-amber-100"
+                        @click="startSubscription"
+                    >
+                        Activer
+                    </button>
+                </div>
+            </div>
             <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>

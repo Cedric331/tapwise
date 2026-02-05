@@ -37,4 +37,8 @@ return [
 
     'contact_email' => env('EMAIL_CONTACT'),
 
+    'stripe' => [
+        'bar_price_id' => env('STRIPE_BAR_PRICE_ID'),
+    ],
+
 ];

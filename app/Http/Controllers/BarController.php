@@ -21,6 +21,10 @@ class BarController extends Controller
         $this->authorize('view', $bar);
 
         $bar->load(['beers.tags', 'users']);
+        $billingUser = $bar->billingUser();
+        $subscriptionStatus = $bar->subscriptionStatus();
+        $trialEndsAt = $subscriptionStatus === 'trial' ? $billingUser?->trial_ends_at : null;
+        $trialDaysLeft = $trialEndsAt ? now()->diffInDays($trialEndsAt, false) : null;
 
         $stats = [
             'total_beers' => $bar->beers()->count(),
@@ -40,6 +44,12 @@ class BarController extends Controller
             'stats' => $stats,
             'recentBeers' => $recentBeers,
             'publicUrl' => $bar->public_url,
+            'subscription' => [
+                'status' => $subscriptionStatus,
+                'trialEndsAt' => $trialEndsAt?->toDateString(),
+                'trialDaysLeft' => $trialDaysLeft !== null ? max($trialDaysLeft, 0) : null,
+                'canAccessPublic' => $bar->hasActiveAccess(),
+            ],
         ]);
     }
 
@@ -62,6 +72,7 @@ class BarController extends Controller
                 'beers_count' => $bar->beers_count,
                 'is_demo' => $bar->is_demo,
                 'can_delete' => $user->can('delete', $bar),
+                'subscription_status' => $bar->subscriptionStatus(),
             ]);
 
         return Inertia::render('Bars/Index', [

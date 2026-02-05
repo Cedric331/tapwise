@@ -26,7 +26,7 @@ class PublicRecommendationController extends Controller
         $bar = Bar::where('slug', $slug)->firstOrFail();
 
         // Check if QR is enabled
-        if (!$bar->qr_enabled) {
+        if (! $bar->qr_enabled || ! $bar->hasActiveAccess()) {
             return Inertia::render('Public/Disabled', [
                 'bar' => $bar,
             ]);
@@ -67,7 +67,7 @@ class PublicRecommendationController extends Controller
     {
         $bar = Bar::where('slug', $slug)->firstOrFail();
 
-        if (!$bar->qr_enabled) {
+        if (! $bar->qr_enabled || ! $bar->hasActiveAccess()) {
             return Inertia::render('Public/Disabled', [
                 'bar' => $bar,
             ]);

@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\BarController;
 use App\Http\Controllers\BarSettingsController;
+use App\Http\Controllers\BarSubscriptionController;
 use App\Http\Controllers\BeerController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\PublicRecommendationController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -14,6 +16,7 @@ use Laravel\Fortify\Features;
 Route::get('/', [MarketingController::class, 'index'])->name('home');
 Route::get('/b/{slug}', [PublicRecommendationController::class, 'show'])->name('public.bar.show');
 Route::post('/b/{slug}/recommend', [PublicRecommendationController::class, 'recommend'])->name('public.bar.recommend');
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
 
 // Legal pages
 Route::get('/mentions-legales', function () {
@@ -66,9 +69,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/bars/{bar}/settings', [BarSettingsController::class, 'edit'])->name('bars.settings.edit');
     Route::match(['put', 'post'], '/bars/{bar}/settings', [BarSettingsController::class, 'update'])->name('bars.settings.update');
 
+    // Subscriptions
+    Route::post('/bars/{bar}/subscription/checkout', [BarSubscriptionController::class, 'checkout'])->name('bars.subscription.checkout');
+    Route::get('/bars/{bar}/subscription/portal', [BarSubscriptionController::class, 'portal'])->name('bars.subscription.portal');
+
     // QR Code
     Route::get('/bars/{bar}/qr-code', [QrCodeController::class, 'show'])->name('bars.qr-code.show');
     Route::get('/bars/{bar}/qr-code/download', [QrCodeController::class, 'download'])->name('bars.qr-code.download');
+    Route::put('/bars/{bar}/qr-code/status', [QrCodeController::class, 'updateStatus'])->name('bars.qr-code.status');
 
     // Beers
     Route::get('/bars/{bar}/beers', [BeerController::class, 'index'])->name('bars.beers.index');

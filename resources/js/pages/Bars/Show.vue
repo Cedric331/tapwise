@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { CheckCircle2, AlertCircle, Beer, Settings, QrCode, Copy, ExternalLink, Plus, Sparkles } from 'lucide-vue-next';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { CheckCircle2, AlertCircle, Beer, Settings, QrCode, Copy, ExternalLink, Plus, Sparkles, CreditCard } from 'lucide-vue-next';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { ref } from 'vue';
 
@@ -29,6 +29,12 @@ interface Props {
     };
     recentBeers: Beer[];
     publicUrl: string;
+    subscription: {
+        status: 'active' | 'trial' | 'inactive';
+        trialEndsAt?: string | null;
+        trialDaysLeft?: number | null;
+        canAccessPublic: boolean;
+    };
 }
 
 const props = defineProps<Props>();
@@ -40,6 +46,10 @@ const copyUrl = async () => {
     setTimeout(() => {
         copied.value = false;
     }, 2000);
+};
+
+const startSubscription = () => {
+    router.post(`/bars/${props.bar.slug}/subscription/checkout`, {}, { preserveScroll: true });
 };
 </script>
 
@@ -75,7 +85,7 @@ const copyUrl = async () => {
                                 </Link>
                             </div>
                         </div>
-                        <div class="relative hidden lg:block">
+                        <div class="relative hidden lg:block z-0">
                             <div class="relative">
                                 <div class="absolute -left-6 -top-6 h-40 w-40 rounded-full bg-amber-100/70 blur-2xl"></div>
                                 <div class="relative z-10">
@@ -85,7 +95,7 @@ const copyUrl = async () => {
                                         class="h-auto w-full max-w-sm drop-shadow-xl"
                                     />
                                 </div>
-                                <div class="absolute -bottom-25 -right-15 z-0 opacity-80">
+                                <div class="absolute -bottom-25 -right-15 z-0 opacity-80 pointer-events-none">
                                     <img
                                         src="/assets/illustration-bartender.png"
                                         alt="Illustration barman"
@@ -243,6 +253,12 @@ const copyUrl = async () => {
                             <div class="flex flex-wrap items-center gap-3">
                                 <h3 class="text-lg font-semibold text-white">URL publique</h3>
                                 <span class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">Partage instantané</span>
+                                <span
+                                    class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
+                                    :class="subscription.canAccessPublic ? 'bg-emerald-500/25 text-white' : 'bg-white/20 text-white'"
+                                >
+                                    {{ subscription.canAccessPublic ? 'Lien actif' : 'Lien désactivé' }}
+                                </span>
                             </div>
                             <p class="mt-1 text-sm text-amber-100">Partagez cette URL avec vos clients</p>
                             <div class="mt-4 flex gap-2">

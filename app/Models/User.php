@@ -51,6 +51,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'is_admin' => 'boolean',
+            'trial_ends_at' => 'datetime',
         ];
     }
 
@@ -70,5 +71,25 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->is_admin === true;
+    }
+
+    public function hasActiveTrial(): bool
+    {
+        return $this->trial_ends_at !== null && $this->trial_ends_at->isFuture();
+    }
+
+    public function hasActiveSubscription(string $subscriptionName): bool
+    {
+        return $this->subscriptions()
+            ->where('type', $subscriptionName)
+            ->active()
+            ->exists();
+    }
+
+    public function hasAnyActiveSubscription(): bool
+    {
+        return $this->subscriptions()
+            ->active()
+            ->exists();
     }
 }

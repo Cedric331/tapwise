@@ -10,6 +10,7 @@ interface Bar {
     beers_count: number;
     is_demo: boolean;
     can_delete: boolean;
+    subscription_status: 'active' | 'trial' | 'inactive';
 }
 
 interface Props {
@@ -126,6 +127,23 @@ const deleteBar = (bar: Bar) => {
                                 class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800"
                             >
                                 Démo
+                            </span>
+                            <span
+                                v-else
+                                class="rounded-full border px-3 py-1 text-xs font-semibold"
+                                :class="{
+                                    'border-emerald-200 bg-emerald-50 text-emerald-700': bar.subscription_status === 'active',
+                                    'border-amber-200 bg-amber-50 text-amber-800': bar.subscription_status === 'trial',
+                                    'border-red-200 bg-red-50 text-red-700': bar.subscription_status === 'inactive',
+                                }"
+                            >
+                                {{
+                                    bar.subscription_status === 'active'
+                                        ? 'Abonnement actif'
+                                        : bar.subscription_status === 'trial'
+                                            ? 'Essai en cours'
+                                            : 'Abonnement inactif'
+                                }}
                             </span>
                         </div>
                         <div class="mt-6 flex items-center justify-between gap-3">
