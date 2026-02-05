@@ -75,6 +75,16 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
+        if ($request->user()) {
+            $user = $request->user();
+            $barsQuery = $user->is_admin ? Bar::query() : $user->bars();
+
+            $shared['bars'] = $barsQuery
+                ->select('id', 'name', 'slug')
+                ->orderBy('name')
+                ->get();
+        }
+
         return $shared;
     }
 }

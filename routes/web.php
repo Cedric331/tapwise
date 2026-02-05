@@ -36,20 +36,31 @@ Route::get('/contact', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
-        
-        // If user has bars, redirect to first bar
+
+        $barId = session('current_bar_id');
+        if ($barId) {
+            $bar = $user->is_admin
+                ? \App\Models\Bar::find($barId)
+                : $user->bars()->where('bars.id', $barId)->first();
+
+            if ($bar) {
+                return redirect()->route('bars.show', $bar);
+            }
+        }
+
         $bar = $user->bars()->first();
         if ($bar) {
             return redirect()->route('bars.show', $bar);
         }
-        
-        // Otherwise, show bars index
+
         return redirect()->route('bars.index');
     })->name('dashboard');
 
     // Bars
     Route::get('/bars', [BarController::class, 'index'])->name('bars.index');
+    Route::post('/bars', [BarController::class, 'store'])->name('bars.store');
     Route::get('/bars/{bar}', [BarController::class, 'show'])->name('bars.show');
+    Route::delete('/bars/{bar}', [BarController::class, 'destroy'])->name('bars.destroy');
 
     // Bar settings
     Route::get('/bars/{bar}/settings', [BarSettingsController::class, 'edit'])->name('bars.settings.edit');
@@ -61,6 +72,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Beers
     Route::get('/bars/{bar}/beers', [BeerController::class, 'index'])->name('bars.beers.index');
+    Route::get('/bars/{bar}/beers/template', [BeerController::class, 'template'])->name('bars.beers.template');
+    Route::post('/bars/{bar}/beers/import/preview', [BeerController::class, 'previewImport'])->name('bars.beers.import.preview');
+    Route::post('/bars/{bar}/beers/import', [BeerController::class, 'import'])->name('bars.beers.import');
     Route::get('/bars/{bar}/beers/create', [BeerController::class, 'create'])->name('bars.beers.create');
     Route::post('/bars/{bar}/beers', [BeerController::class, 'store'])->name('bars.beers.store');
     Route::get('/bars/{bar}/beers/{beer}/edit', [BeerController::class, 'edit'])->name('bars.beers.edit');

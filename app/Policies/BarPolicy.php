@@ -8,6 +8,14 @@ use App\Models\User;
 class BarPolicy
 {
     /**
+     * Determine if the user can create a bar.
+     */
+    public function create(User $user): bool
+    {
+        return true;
+    }
+
+    /**
      * Determine if the user can view the bar.
      */
     public function view(User $user, Bar $bar): bool
@@ -31,6 +39,24 @@ class BarPolicy
         $pivot = $bar->users()->where('user_id', $user->id)->first()?->pivot;
 
         return $pivot && in_array($pivot->role, ['owner', 'manager']);
+    }
+
+    /**
+     * Determine if the user can delete the bar.
+     */
+    public function delete(User $user, Bar $bar): bool
+    {
+        if ($bar->is_demo) {
+            return false;
+        }
+
+        if ($user->is_admin) {
+            return true;
+        }
+
+        $pivot = $bar->users()->where('user_id', $user->id)->first()?->pivot;
+
+        return $pivot && $pivot->role === 'owner';
     }
 
     /**

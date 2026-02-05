@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { BookOpen, Folder, Beer, LayoutGrid, Store } from 'lucide-vue-next';
+import { BookOpen, Folder, Beer, LayoutGrid, Store, ChevronDown } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
     Sidebar,
     SidebarContent,
@@ -20,6 +28,9 @@ import AppLogoIcon from './AppLogoIcon.vue';
 
 const page = usePage();
 const currentBar = computed(() => (page.props as any).currentBar as { id: number; name: string; slug: string } | undefined);
+const bars = computed(() => ((page.props as any).bars ?? []) as Array<{ id: number; name: string; slug: string }>);
+
+const barLabel = computed(() => currentBar.value?.name ?? 'Sélectionner un bar');
 
 const mainNavItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [
@@ -81,6 +92,46 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
+            <div class="px-3 py-4">
+                <div class="px-2 text-xs font-semibold uppercase tracking-widest text-amber-800/80">
+                    Bars
+                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                        <button
+                            type="button"
+                            class="mt-3 flex w-full items-center justify-between rounded-xl border border-amber-100 bg-white px-3 py-3 text-left text-[15px] font-semibold text-amber-900 shadow-sm transition-all hover:bg-amber-50"
+                        >
+                            <span class="flex items-center gap-2">
+                                <Store class="h-4 w-4 text-amber-700" />
+                                <span class="truncate">{{ barLabel }}</span>
+                            </span>
+                            <ChevronDown class="h-4 w-4 text-amber-700" />
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent class="w-64" align="start">
+                        <DropdownMenuLabel>Choisir un bar</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            v-for="bar in bars"
+                            :key="bar.id"
+                            as-child
+                        >
+                            <Link :href="`/bars/${bar.slug}`" class="flex w-full items-center gap-2">
+                                <Store class="h-4 w-4" />
+                                <span class="truncate">{{ bar.name }}</span>
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem as-child>
+                            <Link href="/bars" class="flex w-full items-center gap-2">
+                                <Store class="h-4 w-4" />
+                                Gérer mes bars
+                            </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
             <NavMain :items="mainNavItems" />
         </SidebarContent>
 
