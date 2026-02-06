@@ -83,8 +83,8 @@ class HandleInertiaRequests extends Middleware
             $barsQuery = $user->is_admin ? Bar::query() : $user->bars();
 
             $shared['bars'] = $barsQuery
-                ->select('id', 'name', 'slug')
-                ->orderBy('name')
+                ->select('bars.id', 'bars.name', 'bars.slug')
+                ->orderBy('bars.name')
                 ->get();
         }
 
