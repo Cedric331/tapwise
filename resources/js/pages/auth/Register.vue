@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 import { QrCode } from 'lucide-vue-next';
+import AppLogo from '@/components/AppLogo.vue';
 
 const barName = ref('');
 const barSlug = ref('');
@@ -39,7 +40,7 @@ const previewUrl = computed(() => {
                 <div class="mb-10 text-center">
                     <div class="mb-6 flex justify-center">
                         <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-800 shadow-md">
-                            <QrCode class="h-7 w-7 text-white" />
+                            <AppLogo class="h-7 w-7 text-white" />
                         </div>
                     </div>
                     <h1 class="text-3xl font-bold text-gray-900">Créer un compte bar</h1>
