@@ -538,15 +538,11 @@ onMounted(() => {
                             </li>
                             <li class="flex items-start gap-4">
                                 <CheckCircle2 class="mt-0.5 h-6 w-6 flex-shrink-0 text-green-600" />
-                                <span class="text-gray-700 leading-relaxed">Personnalisation complète de l'expérience</span>
+                                <span class="text-gray-700 leading-relaxed">Personnalisation de l'expérience</span>
                             </li>
                             <li class="flex items-start gap-4">
                                 <CheckCircle2 class="mt-0.5 h-6 w-6 flex-shrink-0 text-green-600" />
-                                <span class="text-gray-700 leading-relaxed">Statistiques et analytics détaillés</span>
-                            </li>
-                            <li class="flex items-start gap-4">
-                                <CheckCircle2 class="mt-0.5 h-6 w-6 flex-shrink-0 text-green-600" />
-                                <span class="text-gray-700 leading-relaxed">Support client prioritaire</span>
+                                <span class="text-gray-700 leading-relaxed">Support client</span>
                             </li>
                             <li class="flex items-start gap-4">
                                 <CheckCircle2 class="mt-0.5 h-6 w-6 flex-shrink-0 text-green-600" />
