@@ -4,6 +4,7 @@ use App\Http\Controllers\BarController;
 use App\Http\Controllers\BarSettingsController;
 use App\Http\Controllers\BarSubscriptionController;
 use App\Http\Controllers\BeerController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\PublicRecommendationController;
 use App\Http\Controllers\QrCodeController;
@@ -36,6 +37,7 @@ Route::get('/cgu', function () {
 Route::get('/contact', function () {
     return Inertia::render('Legal/Contact');
 })->name('legal.contact');
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {

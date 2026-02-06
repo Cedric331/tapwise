@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { onMounted, ref } from 'vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import { QrCode, Users, TrendingUp, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Clock, Heart, Star, MessageSquare } from 'lucide-vue-next';
 import { login, register } from '@/routes';
 import AppLogo from '@/components/AppLogo.vue';
@@ -10,6 +10,43 @@ const baseUrl = 'https://app.tapwise.fr';
 const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
 const heroPoster = '/assets/hero-video.png';
 const heroVideoSrc = '/assets/hero-video.mp4';
+const form = useForm({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+});
+
+const notification = ref<{ type: 'success' | 'error'; message: string } | null>(null);
+let notificationTimer: number | null = null;
+
+const showNotification = (type: 'success' | 'error', message: string) => {
+    notification.value = { type, message };
+    if (notificationTimer) {
+        window.clearTimeout(notificationTimer);
+    }
+    notificationTimer = window.setTimeout(() => {
+        notification.value = null;
+    }, 4500);
+};
+
+const submitContact = () => {
+    form.post('/contact', {
+        preserveScroll: true,
+        onSuccess: () => {
+            showNotification('success', 'Message envoyé. Nous vous répondrons rapidement.');
+            form.reset();
+        },
+        onError: (errors) => {
+            const message =
+                errors.form ||
+                errors.message ||
+                Object.values(errors)[0] ||
+                "Une erreur est survenue. Merci de réessayer.";
+            showNotification('error', message);
+        },
+    });
+};
 
 onMounted(() => {
     const video = document.querySelector<HTMLVideoElement>('video[data-src]');
@@ -500,6 +537,86 @@ onMounted(() => {
             </div>
         </section>
 
+        <!-- Contact -->
+        <section id="contact" class="bg-[#FDFDFC] py-24">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+                    <div>
+                        <p class="text-sm font-medium text-amber-800 mb-2">Contact</p>
+                        <h2 class="text-4xl font-bold text-gray-900 mb-4">Parlons de votre bar</h2>
+                        <p class="text-lg text-gray-600 leading-relaxed">
+                            Une question sur Tapwise ? Une démo pour votre carte des bières ? Écrivez-nous et nous répondons rapidement.
+                        </p>
+                    </div>
+                    <div class="rounded-2xl bg-white p-8 shadow-sm border border-amber-100">
+                        <form @submit.prevent="submitContact" class="space-y-5">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
+                                    <input
+                                        v-model="form.name"
+                                        type="text"
+                                        required
+                                        autocomplete="name"
+                                        class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                        placeholder="Jean Dupont"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                    <input
+                                        v-model="form.email"
+                                        type="email"
+                                        required
+                                        autocomplete="email"
+                                        class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                        placeholder="jean@bar.fr"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sujet *</label>
+                                <input
+                                    v-model="form.subject"
+                                    type="text"
+                                    required
+                                    class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                    placeholder="Demande de démo / Informations"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                                <textarea
+                                    v-model="form.message"
+                                    rows="6"
+                                    required
+                                    class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                    placeholder="Parlez-nous de votre établissement…"
+                                />
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <input type="checkbox" required class="h-4 w-4 rounded border-gray-300" />
+                                <span>
+                                    J'accepte que mes données soient utilisées pour répondre à ma demande.
+                                    <Link href="/politique-de-confidentialite" class="text-amber-700 hover:text-amber-800">
+                                        En savoir plus
+                                    </Link>
+                                </span>
+                            </div>
+                            <button
+                                type="submit"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
+                                :disabled="form.processing"
+                            >
+                                <span v-if="form.processing">Envoi en cours...</span>
+                                <span v-else>Envoyer le message</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Footer -->
         <footer class="border-t border-amber-100 bg-[#FDFDFC]">
             <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -578,5 +695,15 @@ onMounted(() => {
                 </div>
             </div>
         </footer>
+
+        <div
+            v-if="notification"
+            class="fixed bottom-6 right-6 z-50 max-w-sm rounded-lg px-4 py-3 text-sm shadow-lg"
+            :class="notification.type === 'success'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-red-600 text-white'"
+        >
+            {{ notification.message }}
+        </div>
     </div>
 </template>
