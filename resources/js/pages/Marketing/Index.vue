@@ -353,7 +353,7 @@ onMounted(() => {
                         <p class="text-gray-600 leading-relaxed mb-4">
                             Des recommandations pertinentes incitent à la découverte de nouvelles références et augmentent le panier moyen.
                         </p>
-                        <p class="text-lg font-semibold text-amber-800">+15% de ventes additionnelles</p>
+                        <p class="text-lg font-semibold text-amber-800">Découverte de nouvelles références</p>
                     </div>
                     
                     <div class="rounded-2xl bg-white p-8 shadow-sm border border-amber-100">
@@ -364,7 +364,7 @@ onMounted(() => {
                         <p class="text-gray-600 leading-relaxed mb-4">
                             Une expérience personnalisée qui transforme chaque visite en un moment unique et renforce la fidélité.
                         </p>
-                        <p class="text-lg font-semibold text-amber-800">92% de satisfaction client</p>
+                        <p class="text-lg font-semibold text-amber-800">Expérience personnalisée et renforcée</p>
                     </div>
                     
                     <div class="rounded-2xl bg-white p-8 shadow-sm border border-amber-100">
@@ -394,23 +394,23 @@ onMounted(() => {
                     <div class="rounded-2xl bg-[#FDFDFC] p-8 border border-amber-100">
                         <div class="text-6xl font-bold text-amber-200 mb-4 leading-none">"</div>
                         <p class="text-gray-700 leading-relaxed mb-6">
-                            Tapwise a transformé l'expérience de nos clients. Ils adorent découvrir de nouvelles bières qu'ils n'auraient jamais osé commander autrement.
+                            Les clients adorent découvrir de nouvelles bières qu'ils n'auraient jamais osé commander autrement. Des petites améliorations à faire mais c'est top.
                         </p>
                         <div class="border-t border-amber-100 pt-4">
                             <p class="font-semibold text-gray-900">Marie-Claire Dubois</p>
                             <p class="text-sm text-gray-600">Gérante, Le Houblon Doré</p>
-                            <p class="text-xs text-gray-500">Lyon</p>
+                            <!-- <p class="text-xs text-gray-500">Lyon</p> -->
                         </div>
                     </div>
                     
                     <div class="rounded-2xl bg-[#FDFDFC] p-8 border border-amber-100">
                         <div class="text-6xl font-bold text-amber-200 mb-4 leading-none">"</div>
                         <p class="text-gray-700 leading-relaxed mb-6">
-                            Un gain de temps incroyable aux heures de pointe. Nos serveurs peuvent enfin se concentrer sur l'accueil plutôt que sur les explications de la carte.
+                            J'adore l'idée et cela est ludique pour les clients
                         </p>
                         <div class="border-t border-amber-100 pt-4">
-                            <p class="font-semibold text-gray-900">Thomas Bernard</p>
-                            <p class="text-sm text-gray-600">Propriétaire, La Brasserie Artisanale</p>
+                            <p class="font-semibold text-gray-900">Thomas</p>
+                            <p class="text-sm text-gray-600">La Brasserie Artisanale</p>
                             <p class="text-xs text-gray-500">Bordeaux</p>
                         </div>
                     </div>
@@ -418,11 +418,11 @@ onMounted(() => {
                     <div class="rounded-2xl bg-[#FDFDFC] p-8 border border-amber-100">
                         <div class="text-6xl font-bold text-amber-200 mb-4 leading-none">"</div>
                         <p class="text-gray-700 leading-relaxed mb-6">
-                            L'outil parfait pour mettre en valeur notre sélection de bières craft. Nos clients repartent avec le sourire et reviennent avec des amis.
+                           Cela permet de mettre en valeur notre sélection de bières. Merci
                         </p>
                         <div class="border-t border-amber-100 pt-4">
-                            <p class="font-semibold text-gray-900">Sophie Mercier</p>
-                            <p class="text-sm text-gray-600">Directrice, Le Comptoir des Bières</p>
+                            <p class="font-semibold text-gray-900">Benoit Conte</p>
+                            <p class="text-sm text-gray-600">Comptoir des Bières</p>
                             <p class="text-xs text-gray-500">Paris</p>
                         </div>
                     </div>
