@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Shield, Database, Lock, Eye, Trash2 } from 'lucide-vue-next';
+
+const baseUrl = 'https://app.tapwise.fr';
+const pageUrl = `${baseUrl}/politique-de-confidentialite`;
+const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
 </script>
 
 <template>
@@ -8,6 +12,17 @@ import { ArrowLeft, Shield, Database, Lock, Eye, Trash2 } from 'lucide-vue-next'
         <title>Politique de confidentialité - Tapwise</title>
         <meta name="description" content="Politique de confidentialité de Tapwise - Protection des données personnelles conforme RGPD." />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Politique de confidentialité - Tapwise" />
+        <meta property="og:description" content="Protection des données personnelles conforme au RGPD pour Tapwise." />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" :content="pageUrl" />
+        <meta property="og:image" :content="ogImage" />
+        <meta property="og:image:alt" content="Tapwise - Politique de confidentialité" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Politique de confidentialité - Tapwise" />
+        <meta name="twitter:description" content="Protection des données personnelles conforme au RGPD." />
+        <meta name="twitter:image" :content="ogImage" />
+        <link rel="canonical" :href="pageUrl" />
     </Head>
 
     <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">

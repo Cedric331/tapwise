@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Shield, Mail, MapPin } from 'lucide-vue-next';
+
+const baseUrl = 'https://app.tapwise.fr';
+const pageUrl = `${baseUrl}/mentions-legales`;
+const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
 </script>
 
 <template>
@@ -8,6 +12,17 @@ import { ArrowLeft, Shield, Mail, MapPin } from 'lucide-vue-next';
         <title>Mentions légales - Tapwise</title>
         <meta name="description" content="Mentions légales de Tapwise - Informations sur l'éditeur, l'hébergeur et les données personnelles." />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Mentions légales - Tapwise" />
+        <meta property="og:description" content="Informations légales sur Tapwise, l'éditeur et l'hébergeur du site." />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" :content="pageUrl" />
+        <meta property="og:image" :content="ogImage" />
+        <meta property="og:image:alt" content="Tapwise - Mentions légales" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Mentions légales - Tapwise" />
+        <meta name="twitter:description" content="Informations légales sur Tapwise." />
+        <meta name="twitter:image" :content="ogImage" />
+        <link rel="canonical" :href="pageUrl" />
     </Head>
 
     <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">

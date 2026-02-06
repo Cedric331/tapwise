@@ -1,30 +1,68 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { QrCode, Users, TrendingUp, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Clock, Heart, Star, MessageSquare } from 'lucide-vue-next';
 import { login, register } from '@/routes';
 import AppLogo from '@/components/AppLogo.vue';
 
 const demoUrl = '/b/demo';
+const baseUrl = 'https://app.tapwise.fr';
+const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
+const heroPoster = '/assets/hero-video.png';
+const heroVideoSrc = '/assets/hero-video.mp4';
+
+onMounted(() => {
+    const video = document.querySelector<HTMLVideoElement>('video[data-src]');
+    if (!video) {
+        return;
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.innerWidth < 768) {
+        video.remove();
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        ([entry]) => {
+            if (!entry.isIntersecting) {
+                return;
+            }
+
+            video.src = video.dataset.src ?? '';
+            video.playbackRate = 0.5;
+            video.play().catch(() => {
+                // Ignore autoplay failures (e.g., user settings or browser policies).
+            });
+            observer.disconnect();
+        },
+        { threshold: 0.25 }
+    );
+
+    observer.observe(video);
+});
 </script>
 
 <template>
     <Head>
-        <title>Tapwise — L'art du conseil | Aidez vos clients à choisir la bonne bière</title>
+        <title>Tapwise — Logiciel de recommandations de bières pour bars</title>
         <meta
             name="description"
-            content="Tapwise est une solution SaaS qui permet aux bars de recommander des bières à leurs clients via un QR code. Réduisez l'hésitation, augmentez la satisfaction client."
+            content="Logiciel de recommandations de bières pour bars et caves : QR code, carte des bières, suggestions clients personnalisées. Boostez l'expérience et les ventes."
         />
-        <meta name="keywords" content="QR code, bar, bière, recommandation, SaaS, restaurant, établissement" />
+        <meta name="keywords" content="bar, cave, bière pression, carte des bières, QR code, recommandation client, logiciel bar, SaaS" />
         <meta name="author" content="Tapwise" />
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Tapwise — L'art du conseil" />
-        <meta property="og:description" content="Un QR code, 5 questions, 2–3 suggestions basées sur votre carte." />
+        <meta property="og:title" content="Tapwise — Logiciel de recommandations de bières pour bars" />
+        <meta property="og:description" content="QR code et carte des bières intelligente pour guider les clients et augmenter les ventes." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://app.tapwise.fr" />
+        <meta property="og:url" :content="baseUrl" />
+        <meta property="og:image" :content="ogImage" />
+        <meta property="og:image:alt" content="Tapwise - logiciel de recommandations de bières pour bars" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Tapwise — Solution QR Code pour Bars" />
-        <meta name="twitter:description" content="Aidez vos clients à choisir la bonne bière avec un QR code personnalisé." />
-        <link rel="canonical" href="https://app.tapwise.fr" />
+        <meta name="twitter:title" content="Tapwise — Logiciel de recommandations de bières pour bars" />
+        <meta name="twitter:description" content="QR code et recommandations pour la carte des bières." />
+        <meta name="twitter:image" :content="ogImage" />
+        <link rel="canonical" :href="baseUrl" />
     </Head>
 
     <div class="min-h-screen bg-[#FDFDFC] text-[#1b1b18]">
@@ -66,15 +104,14 @@ const demoUrl = '/b/demo';
         <section class="relative overflow-hidden min-h-[90vh] flex items-center">
             <!-- Vidéo en background -->
             <div class="absolute inset-0 z-0">
-                <video 
-                    autoplay 
-                    muted 
+                <video
+                    muted
                     playsinline
-                    playbackRate="0.5"
+                    preload="none"
+                    :poster="heroPoster"
                     class="h-full w-full object-cover"
-                >
-                    <source  src="/assets/hero-video.mp4" type="video/mp4" />
-                </video>
+                    :data-src="heroVideoSrc"
+                ></video>
                 <!-- Overlay blanc semi-transparent -->
                 <div class="absolute inset-0 bg-white/85"></div>
             </div>
@@ -84,11 +121,11 @@ const demoUrl = '/b/demo';
                     <!-- Contenu texte -->
                     <div class="text-center lg:text-left">
                         <h1 class="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl">
-                            Guidez vos clients
-                            <span class="block text-amber-800">vers la bière parfaite</span>
+                            Logiciel de recommandations de bières pour bars
+                            <span class="block text-amber-800">QR code & carte des bières optimisée</span>
                         </h1>
                         <p class="mt-6 text-lg text-gray-600 leading-relaxed">
-                            Un QR code élégant, cinq questions essentielles, des suggestions personnalisées. Une expérience de dégustation raffinée pour vos clients les plus exigeants.
+                            Tapwise aide les bars et caves à guider leurs clients : QR code, questions rapides, recommandations personnalisées selon la carte des bières, en pression ou en bouteille.
                         </p>
                         <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
                             <Link
@@ -153,6 +190,10 @@ const demoUrl = '/b/demo';
                                 src="/assets/illustration-qr-frame.png" 
                                 alt="QR code décoré" 
                                 class="h-auto w-full max-w-md drop-shadow-lg"
+                                loading="lazy"
+                                decoding="async"
+                                width="768"
+                                height="768"
                             />
                         </div>
                     </div>
@@ -369,18 +410,26 @@ const demoUrl = '/b/demo';
                         <div class="relative">
                             <!-- QR code décoré (grande illustration) -->
                             <div class="relative z-10">
-                                <img 
+                            <img 
                                     src="/assets/illustration-qr-frame.png" 
                                     alt="QR code décoré" 
-                                    class="h-auto w-full max-w-md drop-shadow-lg"
+                                class="h-auto w-full max-w-md drop-shadow-lg"
+                                loading="lazy"
+                                decoding="async"
+                                width="768"
+                                height="768"
                                 />
                             </div>
                             <!-- Illustration barman (partiellement visible derrière) -->
                             <div class="absolute -right-18 -bottom-44 z-0 opacity-80">
-                                <img 
+                            <img 
                                     src="/assets/illustration-bartender.png" 
                                     alt="Barman" 
-                                    class="h-auto w-64 max-w-none"
+                                class="h-auto w-64 max-w-none"
+                                loading="lazy"
+                                decoding="async"
+                                width="512"
+                                height="768"
                                 />
                             </div>
                         </div>

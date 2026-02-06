@@ -7,12 +7,14 @@ use App\Http\Controllers\BeerController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\PublicRecommendationController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 // Public routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/', [MarketingController::class, 'index'])->name('home');
 Route::get('/b/{slug}', [PublicRecommendationController::class, 'show'])->name('public.bar.show');
 Route::post('/b/{slug}/recommend', [PublicRecommendationController::class, 'recommend'])->name('public.bar.recommend');

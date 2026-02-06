@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, FileText, AlertCircle } from 'lucide-vue-next';
+
+const baseUrl = 'https://app.tapwise.fr';
+const pageUrl = `${baseUrl}/cgu`;
+const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
 </script>
 
 <template>
@@ -8,6 +12,17 @@ import { ArrowLeft, FileText, AlertCircle } from 'lucide-vue-next';
         <title>Conditions générales d'utilisation - Tapwise</title>
         <meta name="description" content="Conditions générales d'utilisation de Tapwise - CGU de la plateforme." />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="CGU - Tapwise" />
+        <meta property="og:description" content="Conditions générales d'utilisation de la plateforme Tapwise." />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" :content="pageUrl" />
+        <meta property="og:image" :content="ogImage" />
+        <meta property="og:image:alt" content="Tapwise - Conditions générales d'utilisation" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CGU - Tapwise" />
+        <meta name="twitter:description" content="Conditions générales d'utilisation de Tapwise." />
+        <meta name="twitter:image" :content="ogImage" />
+        <link rel="canonical" :href="pageUrl" />
     </Head>
 
     <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">

@@ -2,6 +2,10 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ArrowLeft, Mail, Send, MapPin, Phone } from 'lucide-vue-next';
 
+const baseUrl = 'https://app.tapwise.fr';
+const pageUrl = `${baseUrl}/contact`;
+const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
+
 const form = useForm({
     name: '',
     email: '',
@@ -20,6 +24,17 @@ const submit = () => {
         <title>Contact - Tapwise</title>
         <meta name="description" content="Contactez l'équipe Tapwise pour toute question ou demande d'information." />
         <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Contact - Tapwise" />
+        <meta property="og:description" content="Contactez l'équipe Tapwise pour toute question." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" :content="pageUrl" />
+        <meta property="og:image" :content="ogImage" />
+        <meta property="og:image:alt" content="Tapwise - Contact" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Contact - Tapwise" />
+        <meta name="twitter:description" content="Contactez l'équipe Tapwise." />
+        <meta name="twitter:image" :content="ogImage" />
+        <link rel="canonical" :href="pageUrl" />
     </Head>
 
     <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">

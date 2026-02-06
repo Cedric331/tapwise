@@ -44,15 +44,38 @@
         <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',
-            '@type' => 'SoftwareApplication',
-            'name' => 'Tapwise',
-            'applicationCategory' => 'BusinessApplication',
-            'offers' => [
-                '@type' => 'Offer',
-                'price' => '29',
-                'priceCurrency' => 'EUR',
+            '@graph' => [
+                [
+                    '@type' => 'Organization',
+                    'name' => 'Tapwise',
+                    'url' => config('app.url'),
+                    'logo' => url('/assets/logo.svg'),
+                ],
+                [
+                    '@type' => 'SoftwareApplication',
+                    'name' => 'Tapwise',
+                    'applicationCategory' => 'BusinessApplication',
+                    'operatingSystem' => 'Web',
+                    'url' => route('home'),
+                    'offers' => [
+                        '@type' => 'Offer',
+                        'price' => '29.99',
+                        'priceCurrency' => 'EUR',
+                    ],
+                    'description' => 'Logiciel de recommandations de bières pour bars et caves avec QR code.',
+                ],
+                [
+                    '@type' => 'Service',
+                    'name' => 'Recommandations de bières pour bars',
+                    'provider' => [
+                        '@type' => 'Organization',
+                        'name' => 'Tapwise',
+                    ],
+                    'areaServed' => 'FR',
+                    'description' => 'Service de recommandations client basé sur la carte des bières, via QR code.',
+                    'url' => route('home'),
+                ],
             ],
-            'description' => 'Solution SaaS pour aider les bars à recommander des bières à leurs clients via QR code',
         ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
         </script>
         @endif
