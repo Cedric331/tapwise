@@ -36,7 +36,6 @@ class CreateNewUser implements CreatesNewUsers
             'email.max' => 'L\'adresse email ne peut pas dépasser 255 caractères.',
             'email.unique' => 'Cette adresse email est déjà utilisée par un autre utilisateur, veuillez en choisir une autre.',
             'password.required' => 'Le mot de passe est obligatoire.',
-            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'password.confirmed' => 'Les mots de passe ne correspondent pas.',
             'bar_name.required' => 'Le nom du bar est obligatoire.',
             'bar_slug.required' => 'L\'identifiant unique (slug) est obligatoire.',
