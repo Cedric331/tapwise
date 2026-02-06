@@ -91,6 +91,8 @@ class BarSubscriptionController extends Controller
             abort(500, 'Stripe secret not configured.');
         }
 
+        $billingUser->createOrGetStripeCustomer();
+
         return redirect()->away(
             $billingUser->billingPortalUrl(route('bars.show', $bar))
         );
