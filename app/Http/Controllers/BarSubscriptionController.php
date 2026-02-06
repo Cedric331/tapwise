@@ -42,13 +42,20 @@ class BarSubscriptionController extends Controller
         }
 
         try {
+            $billingUser->createOrGetStripeCustomer();
+
+            $subscriptionBuilder = $billingUser
+                ->newSubscription($bar->subscriptionName(), $priceId);
+
+            if ($billingUser->trial_ends_at && $billingUser->trial_ends_at->isFuture()) {
+                $subscriptionBuilder->trialUntil($billingUser->trial_ends_at);
+            }
+
             /** @var \Laravel\Cashier\Checkout $checkoutResponse */
-            $checkoutResponse = $billingUser
-                ->newSubscription($bar->subscriptionName(), $priceId)
-                ->checkout([
-                    'success_url' => route('bars.show', $bar, ['subscribed' => 1]),
-                    'cancel_url' => route('bars.show', $bar),
-                ]);
+            $checkoutResponse = $subscriptionBuilder->checkout([
+                'success_url' => route('bars.show', $bar, ['subscribed' => 1]),
+                'cancel_url' => route('bars.show', $bar),
+            ]);
 
             if ($request->header('X-Inertia')) {
                 return Inertia::location($checkoutResponse->url);

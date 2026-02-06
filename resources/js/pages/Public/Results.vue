@@ -29,11 +29,14 @@ interface Props {
     };
     recommendations: Recommendation[];
     preferences: {
-        bitterness: string;
-        color: string[];
-        aromas: string[];
-        max_abv: number;
-        format: string;
+        bitterness?: string;
+        color?: string[];
+        aromas?: string[];
+        max_abv?: number;
+        format?: string;
+        style?: string;
+        brewery?: string;
+        max_price?: number;
     };
 }
 

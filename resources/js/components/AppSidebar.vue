@@ -162,11 +162,15 @@ const startSubscription = () => {
                     <div class="flex items-start gap-2">
                         <AlertCircle class="mt-0.5 h-4 w-4 text-amber-700" />
                         <div>
-                            <p v-if="currentBarSubscription.status === 'trial'">
-                                Essai en cours
-                                <span v-if="currentBarSubscription.trialDaysLeft !== null">
-                                    · {{ currentBarSubscription.trialDaysLeft }}j restants
+                            <p v-if="currentBarSubscription.status === 'trial'" class="flex flex-wrap items-center gap-1.5">
+                                <span>Essai en cours</span>
+                                <span
+                                    v-if="currentBarSubscription.trialDaysLeft !== null"
+                                    class="inline-flex h-5 items-center justify-center rounded-full px-0 text-[12px] font-semibold text-amber-900"
+                                >
+                                    {{ Math.ceil(currentBarSubscription.trialDaysLeft) }}
                                 </span>
+                                <span v-if="currentBarSubscription.trialDaysLeft !== null">j restants</span>
                             </p>
                             <p v-else>Abonnement inactif</p>
                         </div>

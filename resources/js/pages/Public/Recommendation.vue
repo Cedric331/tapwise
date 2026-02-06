@@ -14,12 +14,25 @@ interface Props {
     };
     colorOptions: Record<string, string>;
     aromaOptions: Array<{ value: string; label: string }>;
+    styleOptions: string[];
+    breweryOptions: string[];
+    maxPrice: number | null;
+    questionOptions: Array<{ id: string; label: string; description: string }>;
+    selectedQuestions: string[];
 }
 
 const props = defineProps<Props>();
 
-const currentStep = ref(1);
-const totalSteps = 5;
+const currentStep = ref(0);
+const questionOrder = computed(() => props.selectedQuestions);
+const totalSteps = computed(() => questionOrder.value.length);
+const currentQuestionId = computed(() => questionOrder.value[currentStep.value]);
+
+const maxPriceEuros = computed(() => {
+    const max = props.maxPrice ?? 0;
+    const maxEuros = max > 0 ? Math.ceil(max / 100) : 12;
+    return Math.max(maxEuros, 5);
+});
 
 const form = useForm({
     bitterness: '',
@@ -27,6 +40,9 @@ const form = useForm({
     aromas: [] as string[],
     max_abv: 5,
     format: '',
+    style: 'any',
+    brewery: 'any',
+    max_price: maxPriceEuros.value,
 });
 
 const bitternessOptions = [
@@ -59,14 +75,14 @@ const toggleColor = (color: string) => {
 };
 
 const nextStep = () => {
-    if (currentStep.value < totalSteps) {
-        currentStep.value++;
+    if (currentStep.value < totalSteps.value - 1) {
+        currentStep.value += 1;
     }
 };
 
 const prevStep = () => {
-    if (currentStep.value > 1) {
-        currentStep.value--;
+    if (currentStep.value > 0) {
+        currentStep.value -= 1;
     }
 };
 
@@ -82,6 +98,21 @@ const logoSrc = computed(() => {
         ? `/${props.bar.logo_path}`
         : `/storage/${props.bar.logo_path}`;
 });
+
+const isStepValid = (questionId?: string) => {
+    switch (questionId) {
+        case 'bitterness':
+            return !!form.bitterness;
+        case 'color':
+            return form.color.length > 0;
+        case 'aromas':
+            return form.aromas.length > 0;
+        case 'format':
+            return !!form.format;
+        default:
+            return true;
+    }
+};
 </script>
 
 <template>
@@ -107,18 +138,18 @@ const logoSrc = computed(() => {
                 <div class="h-2 rounded-full bg-gray-200">
                     <div
                         class="h-2 rounded-full transition-all"
-                        :style="{ width: `${(currentStep / totalSteps) * 100}%`, backgroundColor: primaryColor }"
+                        :style="{ width: `${((currentStep + 1) / totalSteps) * 100}%`, backgroundColor: primaryColor }"
                     ></div>
                 </div>
                 <p class="mt-2 text-center text-sm text-gray-600">
-                    Étape {{ currentStep }} sur {{ totalSteps }}
+                    Étape {{ currentStep + 1 }} sur {{ totalSteps }}
                 </p>
             </div>
 
             <!-- Form steps -->
             <div class="rounded-lg bg-white p-8 shadow-lg">
                 <!-- Step 1: Bitterness -->
-                <div v-if="currentStep === 1">
+                <div v-if="currentQuestionId === 'bitterness'">
                     <h2 class="mb-4 text-2xl font-semibold">Quelle amertume préférez-vous ?</h2>
                     <div class="space-y-3">
                         <label
@@ -140,7 +171,7 @@ const logoSrc = computed(() => {
                 </div>
 
                 <!-- Step 2: Color -->
-                <div v-if="currentStep === 2">
+                <div v-if="currentQuestionId === 'color'">
                     <h2 class="mb-4 text-2xl font-semibold">Quelle couleur de bière préférez-vous ?</h2>
                     <p class="mb-4 text-gray-600">Sélectionnez une ou plusieurs couleurs</p>
                     <div class="grid grid-cols-2 gap-3">
@@ -159,7 +190,7 @@ const logoSrc = computed(() => {
                 </div>
 
                 <!-- Step 3: Aromas -->
-                <div v-if="currentStep === 3">
+                <div v-if="currentQuestionId === 'aromas'">
                     <h2 class="mb-4 text-2xl font-semibold">Quels arômes vous plaisent ?</h2>
                     <p class="mb-4 text-gray-600">Sélectionnez un ou plusieurs arômes</p>
                     <div class="grid grid-cols-2 gap-3">
@@ -178,7 +209,7 @@ const logoSrc = computed(() => {
                 </div>
 
                 <!-- Step 4: Max ABV -->
-                <div v-if="currentStep === 4">
+                <div v-if="currentQuestionId === 'max_abv'">
                     <h2 class="mb-4 text-2xl font-semibold">Degré d'alcool maximum souhaité</h2>
                     <div class="space-y-4">
                         <input
@@ -197,7 +228,7 @@ const logoSrc = computed(() => {
                 </div>
 
                 <!-- Step 5: Format -->
-                <div v-if="currentStep === 5">
+                <div v-if="currentQuestionId === 'format'">
                     <h2 class="mb-4 text-2xl font-semibold">Quel format préférez-vous ?</h2>
                     <div class="space-y-3">
                         <label
@@ -218,10 +249,57 @@ const logoSrc = computed(() => {
                     </div>
                 </div>
 
+                <div v-if="currentQuestionId === 'style'">
+                    <h2 class="mb-4 text-2xl font-semibold">Quel style de bière préférez-vous ?</h2>
+                    <p class="mb-4 text-gray-600">Choisissez un style ou laissez "Peu importe"</p>
+                    <select
+                        v-model="form.style"
+                        class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    >
+                        <option value="any">Peu importe</option>
+                        <option v-for="style in styleOptions" :key="style" :value="style">
+                            {{ style }}
+                        </option>
+                    </select>
+                </div>
+
+                <div v-if="currentQuestionId === 'brewery'">
+                    <h2 class="mb-4 text-2xl font-semibold">Une brasserie en particulier ?</h2>
+                    <p class="mb-4 text-gray-600">Choisissez une brasserie ou laissez "Peu importe"</p>
+                    <select
+                        v-model="form.brewery"
+                        class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    >
+                        <option value="any">Peu importe</option>
+                        <option v-for="brewery in breweryOptions" :key="brewery" :value="brewery">
+                            {{ brewery }}
+                        </option>
+                    </select>
+                </div>
+
+                <div v-if="currentQuestionId === 'max_price'">
+                    <h2 class="mb-4 text-2xl font-semibold">Budget maximum par bière</h2>
+                    <div class="space-y-4">
+                        <input
+                            v-model.number="form.max_price"
+                            type="range"
+                            min="0"
+                            :max="maxPriceEuros"
+                            step="0.5"
+                            class="w-full"
+                            :style="{ accentColor: primaryColor }"
+                        />
+                        <div class="text-center">
+                            <span class="text-3xl font-bold" :style="{ color: primaryColor }">
+                                {{ form.max_price.toFixed(1) }}€
+                            </span>
+                        </div>
+                    </div>
+                </div>
                 <!-- Navigation buttons -->
                 <div class="mt-8 flex justify-between">
                     <button
-                        v-if="currentStep > 1"
+                        v-if="currentStep > 0"
                         type="button"
                         class="rounded-md border border-gray-300 bg-white px-6 py-2 text-gray-700 hover:bg-gray-50"
                         @click="prevStep"
@@ -231,11 +309,11 @@ const logoSrc = computed(() => {
                     <div v-else></div>
 
                     <button
-                        v-if="currentStep < totalSteps"
+                        v-if="currentStep < totalSteps - 1"
                         type="button"
                         class="rounded-md px-6 py-2 text-white disabled:opacity-50"
                         :style="{ backgroundColor: primaryColor }"
-                        :disabled="(currentStep === 1 && !form.bitterness) || (currentStep === 2 && form.color.length === 0) || (currentStep === 3 && form.aromas.length === 0)"
+                        :disabled="!isStepValid(currentQuestionId)"
                         @click="nextStep"
                     >
                         Suivant
@@ -245,7 +323,7 @@ const logoSrc = computed(() => {
                         type="button"
                         class="rounded-md px-6 py-2 text-white disabled:opacity-50"
                         :style="{ backgroundColor: primaryColor }"
-                        :disabled="!form.format || form.processing"
+                        :disabled="!isStepValid(currentQuestionId) || form.processing"
                         @click="submit"
                     >
                         <span v-if="form.processing">Traitement...</span>

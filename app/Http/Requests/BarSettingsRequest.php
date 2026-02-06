@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Support\RecommendationQuestions;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BarSettingsRequest extends FormRequest
 {
@@ -27,6 +29,8 @@ class BarSettingsRequest extends FormRequest
             'brand_primary_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'welcome_message' => ['nullable', 'string', 'max:500'],
             'qr_enabled' => ['boolean'],
+            'recommendation_questions' => ['nullable', 'array', 'min:3', 'max:10'],
+            'recommendation_questions.*' => ['string', Rule::in(RecommendationQuestions::ids())],
         ];
     }
 }

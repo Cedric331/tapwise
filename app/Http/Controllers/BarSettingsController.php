@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BarSettingsRequest;
 use App\Models\Bar;
+use App\Support\RecommendationQuestions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -20,6 +21,10 @@ class BarSettingsController extends Controller
 
         return Inertia::render('Bars/Settings', [
             'bar' => $bar,
+            'recommendationQuestions' => RecommendationQuestions::all(),
+            'selectedRecommendationQuestions' => RecommendationQuestions::normalizeSelected(
+                $bar->recommendation_questions
+            ),
         ]);
     }
 

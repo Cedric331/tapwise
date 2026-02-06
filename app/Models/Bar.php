@@ -18,6 +18,7 @@ class Bar extends Model
         'brand_background_color',
         'brand_primary_color',
         'welcome_message',
+        'recommendation_questions',
         'qr_enabled',
         'count_scans',
         'is_demo',
@@ -27,6 +28,7 @@ class Bar extends Model
         'qr_enabled' => 'boolean',
         'count_scans' => 'integer',
         'is_demo' => 'boolean',
+        'recommendation_questions' => 'array',
     ];
 
     /**

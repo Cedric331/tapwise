@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ArrowLeft, Upload, Image as ImageIcon, Palette, MessageSquare, ToggleLeft, Save } from 'lucide-vue-next';
+import { ArrowLeft, Upload, Image as ImageIcon, Palette, MessageSquare, ToggleLeft, Save, ListChecks } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 
@@ -15,7 +15,10 @@ interface Props {
         welcome_message?: string;
         qr_enabled: boolean;
         is_demo: boolean;
+        recommendation_questions?: string[] | null;
     };
+    recommendationQuestions: Array<{ id: string; label: string; description: string }>;
+    selectedRecommendationQuestions: string[];
 }
 
 const props = defineProps<Props>();
@@ -34,6 +37,7 @@ const form = useForm({
     brand_primary_color: props.bar.brand_primary_color || '#4f46e5',
     welcome_message: props.bar.welcome_message || '',
     qr_enabled: props.bar.qr_enabled,
+    recommendation_questions: [...props.selectedRecommendationQuestions],
 });
 
 const handleLogoChange = (event: Event) => {
@@ -64,6 +68,12 @@ const submit = () => {
         forceFormData: true,
     });
 };
+
+const selectedQuestionCount = computed(() => form.recommendation_questions.length);
+const canSelectMoreQuestions = computed(() => selectedQuestionCount.value < 10);
+const hasMinimumQuestions = computed(() => selectedQuestionCount.value >= 3);
+const isQuestionDisabled = (questionId: string) =>
+    !form.recommendation_questions.includes(questionId) && !canSelectMoreQuestions.value;
 </script>
 
 <template>
@@ -224,6 +234,59 @@ const submit = () => {
                         />
                     </div>
 
+                    <!-- Recommendation Questions -->
+                    <div class="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
+                        <div class="mb-4 flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                                <ListChecks class="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900">Questions de recommandation</h2>
+                                <p class="text-sm text-gray-500">Sélectionnez entre 3 et 10 questions à poser</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 flex flex-wrap items-center gap-3 text-xs font-medium text-amber-800">
+                            <span class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1">
+                                {{ selectedQuestionCount }} / 10 sélectionnées
+                            </span>
+                            <span
+                                v-if="!hasMinimumQuestions"
+                                class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800"
+                            >
+                                Minimum 3 questions
+                            </span>
+                        </div>
+
+                        <div class="grid gap-3 sm:grid-cols-2">
+                            <label
+                                v-for="question in recommendationQuestions"
+                                :key="question.id"
+                                class="flex cursor-pointer items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/20 p-4 transition hover:border-amber-200"
+                                :class="{
+                                    'opacity-60 cursor-not-allowed': bar.is_demo || isQuestionDisabled(question.id),
+                                    'border-amber-300 bg-amber-50': form.recommendation_questions.includes(question.id),
+                                }"
+                            >
+                                <input
+                                    v-model="form.recommendation_questions"
+                                    type="checkbox"
+                                    :value="question.id"
+                                    class="mt-1 h-4 w-4"
+                                    :disabled="bar.is_demo || isQuestionDisabled(question.id)"
+                                />
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900">{{ question.label }}</p>
+                                    <p class="text-xs text-gray-500">{{ question.description }}</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <p class="mt-4 text-xs text-gray-500">
+                            Par défaut, les questions actuelles sont conservées tant que vous ne modifiez pas cette sélection.
+                        </p>
+                    </div>
+
                     <!-- QR Code Toggle -->
                     <div v-if="!bar.is_demo" class="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
                         <div class="flex items-center justify-between">
@@ -252,7 +315,7 @@ const submit = () => {
                         <button
                             type="submit"
                             class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
-                            :disabled="form.processing"
+                            :disabled="form.processing || !hasMinimumQuestions"
                         >
                             <Save class="h-4 w-4" />
                             <span v-if="form.processing">Enregistrement...</span>
