@@ -39,4 +39,3 @@ class SendTrialEndingSoonEmails extends Command
         return Command::SUCCESS;
     }
 }
-

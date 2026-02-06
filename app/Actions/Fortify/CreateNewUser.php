@@ -42,7 +42,6 @@ class CreateNewUser implements CreatesNewUsers
             'bar_slug.regex' => 'Le slug ne peut contenir que des lettres minuscules, chiffres et tirets.',
             'bar_slug.unique' => 'Ce slug est déjà utilisé par un autre bar, veuillez le modifier.',
         ])->validate();
-        
 
         return DB::transaction(function () use ($input) {
             $user = User::create([

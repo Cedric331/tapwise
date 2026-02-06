@@ -300,7 +300,7 @@ class DemoBarSeeder extends Seeder
 
             $beer = Beer::create(array_merge($beerData, ['bar_id' => $bar->id]));
 
-            $tagIds = collect($tags)->map(function ($slug) use ($tags) {
+            $tagIds = collect($tags)->map(function ($slug) {
                 return Tag::where('slug', $slug)->first()?->id;
             })->filter()->toArray();
 
@@ -308,4 +308,3 @@ class DemoBarSeeder extends Seeder
         }
     }
 }
-

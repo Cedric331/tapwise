@@ -9,4 +9,3 @@ class EditTag extends EditRecord
 {
     protected static string $resource = TagResource::class;
 }
-

@@ -69,6 +69,7 @@ class BeerImportService
                     'row' => $rowNumber,
                     'errors' => $validator->errors()->all(),
                 ];
+
                 continue;
             }
 
@@ -142,6 +143,7 @@ class BeerImportService
                 if (array_key_exists($index, $headerRow)) {
                     $mapped[$field] = $index;
                 }
+
                 continue;
             }
 
@@ -368,4 +370,3 @@ class BeerImportService
         return true;
     }
 }
-

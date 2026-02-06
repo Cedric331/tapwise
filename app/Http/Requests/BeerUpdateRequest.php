@@ -39,4 +39,3 @@ class BeerUpdateRequest extends FormRequest
         ];
     }
 }
-

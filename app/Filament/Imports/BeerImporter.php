@@ -88,7 +88,7 @@ class BeerImporter extends Importer
 
     public function resolveRecord(): ?Model
     {
-        return new Beer();
+        return new Beer;
     }
 
     protected function beforeFill(): void
@@ -217,4 +217,3 @@ class BeerImporter extends Importer
         return is_numeric($value) ? (float) $value : null;
     }
 }
-

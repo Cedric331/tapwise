@@ -54,7 +54,7 @@ class BeerRecommendationService
             $beerTagSlugs = $beer->tags->pluck('slug')->toArray();
             $matchingTags = count(array_intersect($preferences['aromas'], $beerTagSlugs));
             $totalTags = count($preferences['aromas']);
-            
+
             if ($totalTags > 0) {
                 $score += ($matchingTags / $totalTags) * $weights['aromas'];
             }
@@ -64,7 +64,7 @@ class BeerRecommendationService
         if (($weights['max_abv'] ?? 0) > 0 && isset($preferences['max_abv'])) {
             $maxAbv = (float) $preferences['max_abv'];
             $beerAbv = $beer->abv;
-            
+
             if ($beerAbv <= $maxAbv) {
                 // Prefer beers closer to max ABV
                 $score += (($beerAbv / max($maxAbv, 1)) * $weights['max_abv']);
@@ -78,7 +78,7 @@ class BeerRecommendationService
         if (($weights['bitterness'] ?? 0) > 0 && isset($preferences['bitterness']) && $beer->ibu !== null) {
             $bitterness = $preferences['bitterness'];
             $ibu = $beer->ibu;
-            
+
             if ($bitterness === 'faible' && $ibu <= 25) {
                 $score += $weights['bitterness'];
             } elseif ($bitterness === 'moyenne' && $ibu > 25 && $ibu <= 50) {
@@ -91,10 +91,10 @@ class BeerRecommendationService
         // Format preference (10% weight)
         if (($weights['format'] ?? 0) > 0 && isset($preferences['format'])) {
             $format = $preferences['format'];
-            
+
             if ($format === 'pression' && $beer->is_on_tap) {
                 $score += $weights['format'];
-            } elseif ($format === 'bouteille' && !$beer->is_on_tap) {
+            } elseif ($format === 'bouteille' && ! $beer->is_on_tap) {
                 $score += $weights['format'];
             }
         }
@@ -148,8 +148,8 @@ class BeerRecommendationService
         if (in_array('aromas', $activeQuestions, true) && isset($preferences['aromas']) && is_array($preferences['aromas'])) {
             $beerTagSlugs = $beer->tags->pluck('slug')->toArray();
             $matchingTags = array_intersect($preferences['aromas'], $beerTagSlugs);
-            
-            if (!empty($matchingTags)) {
+
+            if (! empty($matchingTags)) {
                 $tagNames = $beer->tags->whereIn('slug', $matchingTags)->pluck('name')->join(', ');
                 $reasons[] = "Correspond à vos arômes préférés : {$tagNames}";
             }
@@ -167,11 +167,11 @@ class BeerRecommendationService
         if (in_array('bitterness', $activeQuestions, true) && isset($preferences['bitterness']) && $beer->ibu !== null) {
             $bitterness = $preferences['bitterness'];
             $ibu = $beer->ibu;
-            
+
             if (($bitterness === 'faible' && $ibu <= 25) ||
                 ($bitterness === 'moyenne' && $ibu > 25 && $ibu <= 50) ||
                 ($bitterness === 'forte' && $ibu > 50)) {
-                $reasons[] = "Amertume correspondant à vos préférences";
+                $reasons[] = 'Amertume correspondant à vos préférences';
             }
         }
 
@@ -187,9 +187,9 @@ class BeerRecommendationService
 
         if (in_array('format', $activeQuestions, true) && isset($preferences['format'])) {
             if ($preferences['format'] === 'pression' && $beer->is_on_tap) {
-                $reasons[] = "Disponible à la pression";
-            } elseif ($preferences['format'] === 'bouteille' && !$beer->is_on_tap) {
-                $reasons[] = "Disponible en bouteille";
+                $reasons[] = 'Disponible à la pression';
+            } elseif ($preferences['format'] === 'bouteille' && ! $beer->is_on_tap) {
+                $reasons[] = 'Disponible en bouteille';
             }
         }
 
@@ -214,10 +214,10 @@ class BeerRecommendationService
         }
 
         if (empty($reasons)) {
-            return "Sélection basée sur le profil de la bière";
+            return 'Sélection basée sur le profil de la bière';
         }
 
-        return implode('. ', $reasons) . '.';
+        return implode('. ', $reasons).'.';
     }
 
     /**
@@ -237,4 +237,3 @@ class BeerRecommendationService
         return array_map(fn (float $weight) => ($weight / $total) * 100, $activeWeights);
     }
 }
-

@@ -9,4 +9,3 @@ class CreateBar extends CreateRecord
 {
     protected static string $resource = BarResource::class;
 }
-

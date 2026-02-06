@@ -79,4 +79,3 @@ class BarPolicy
         return $this->update($user, $bar);
     }
 }
-

@@ -55,7 +55,7 @@ class SitemapController extends Controller
     }
 
     /**
-     * @param array<int, array{loc: string, lastmod: Carbon}> $urls
+     * @param  array<int, array{loc: string, lastmod: Carbon}>  $urls
      */
     private function buildXml(array $urls): string
     {
@@ -79,4 +79,3 @@ class SitemapController extends Controller
         return implode("\n", $lines);
     }
 }
-

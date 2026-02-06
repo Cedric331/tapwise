@@ -26,4 +26,3 @@ class BarStoreRequest extends FormRequest
         ];
     }
 }
-

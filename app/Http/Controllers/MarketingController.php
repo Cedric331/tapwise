@@ -15,4 +15,3 @@ class MarketingController extends Controller
         return Inertia::render('Marketing/Index');
     }
 }
-

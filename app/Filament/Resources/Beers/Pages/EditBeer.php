@@ -9,4 +9,3 @@ class EditBeer extends EditRecord
 {
     protected static string $resource = BeerResource::class;
 }
-

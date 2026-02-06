@@ -9,4 +9,3 @@ class CreateBeer extends CreateRecord
 {
     protected static string $resource = BeerResource::class;
 }
-

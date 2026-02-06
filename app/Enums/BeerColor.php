@@ -4,13 +4,13 @@ namespace App\Enums;
 
 enum BeerColor: string
 {
-    case WHITE  = 'white';
+    case WHITE = 'white';
     case BLONDE = 'blonde';
     case GOLDEN = 'golden';
-    case AMBER  = 'amber';
-    case RED    = 'red';
-    case BROWN  = 'brown';
-    case BLACK  = 'black';
+    case AMBER = 'amber';
+    case RED = 'red';
+    case BROWN = 'brown';
+    case BLACK = 'black';
 
     /**
      * Human-readable label (FR)
@@ -18,13 +18,13 @@ enum BeerColor: string
     public function label(): string
     {
         return match ($this) {
-            self::WHITE  => 'Blanche',
+            self::WHITE => 'Blanche',
             self::BLONDE => 'Blonde',
             self::GOLDEN => 'Dorée',
-            self::AMBER  => 'Ambrée',
-            self::RED    => 'Rousse',
-            self::BROWN  => 'Brune',
-            self::BLACK  => 'Noire',
+            self::AMBER => 'Ambrée',
+            self::RED => 'Rousse',
+            self::BROWN => 'Brune',
+            self::BLACK => 'Noire',
         };
     }
 

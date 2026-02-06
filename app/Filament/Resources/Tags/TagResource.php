@@ -50,4 +50,3 @@ class TagResource extends Resource
         ];
     }
 }
-

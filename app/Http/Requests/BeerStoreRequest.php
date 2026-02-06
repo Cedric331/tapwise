@@ -39,4 +39,3 @@ class BeerStoreRequest extends FormRequest
         ];
     }
 }
-

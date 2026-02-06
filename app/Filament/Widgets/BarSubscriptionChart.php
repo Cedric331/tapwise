@@ -2,8 +2,8 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Bar;
 use Alkoumi\FilamentGoogleCharts\Widgets\PieChartWidget;
+use App\Models\Bar;
 
 class BarSubscriptionChart extends PieChartWidget
 {
@@ -11,7 +11,7 @@ class BarSubscriptionChart extends PieChartWidget
 
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 1;
+    protected int|string|array $columnSpan = 1;
 
     protected static ?array $options = [
         'pieHole' => 0.4,
@@ -31,11 +31,13 @@ class BarSubscriptionChart extends PieChartWidget
             $status = $bar->subscriptionStatus();
             if ($status === 'active') {
                 $subscribed++;
+
                 continue;
             }
 
             if ($status === 'trial') {
                 $trial++;
+
                 continue;
             }
 
@@ -50,4 +52,3 @@ class BarSubscriptionChart extends PieChartWidget
         ];
     }
 }
-

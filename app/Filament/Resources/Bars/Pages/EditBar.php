@@ -9,4 +9,3 @@ class EditBar extends EditRecord
 {
     protected static string $resource = BarResource::class;
 }
-

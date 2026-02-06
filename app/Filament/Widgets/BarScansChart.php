@@ -11,7 +11,7 @@ class BarScansChart extends ColumnChartWidget
 
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?array $options = [
         'legend' => ['position' => 'none'],
@@ -30,4 +30,3 @@ class BarScansChart extends ColumnChartWidget
         return array_merge([['Bar', 'Scans']], $rows);
     }
 }
-

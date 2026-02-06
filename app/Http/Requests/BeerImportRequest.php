@@ -38,4 +38,3 @@ class BeerImportRequest extends FormRequest
         ];
     }
 }
-

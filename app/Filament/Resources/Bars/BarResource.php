@@ -50,4 +50,3 @@ class BarResource extends Resource
         ];
     }
 }
-

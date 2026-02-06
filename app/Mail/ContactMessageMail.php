@@ -11,12 +11,11 @@ class ContactMessageMail extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @param array{name: string, email: string, subject: string, message: string} $payload
+     * @param  array{name: string, email: string, subject: string, message: string}  $payload
      */
     public function __construct(
         public array $payload
-    ) {
-    }
+    ) {}
 
     public function build(): self
     {
@@ -26,4 +25,3 @@ class ContactMessageMail extends Mailable
             ->view('emails.contact-message');
     }
 }
-

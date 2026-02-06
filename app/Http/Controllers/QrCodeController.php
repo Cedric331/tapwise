@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bar;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\ImageRendererInterface;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Illuminate\Http\RedirectResponse;
@@ -95,7 +94,7 @@ class QrCodeController extends Controller
         $logoAvailable = (bool) $bar->logo_path;
         $includeLogo = $logoAvailable && $logoRequested;
 
-        if ($style === 'simple' || !in_array($frame, $frameIds, true)) {
+        if ($style === 'simple' || ! in_array($frame, $frameIds, true)) {
             $frame = null;
         }
 
@@ -141,8 +140,7 @@ class QrCodeController extends Controller
         ?string $frameId,
         bool $includeLogo,
         bool $responsive
-    ): string
-    {
+    ): string {
         $frameData = null;
         if ($style === 'framed' && $frameId) {
             $framePath = $this->framePath($frameId);
@@ -162,7 +160,7 @@ class QrCodeController extends Controller
 
         $renderer = new ImageRenderer(
             (new RendererStyle($qrSize))->withMargin(0),
-            new SvgImageBackEnd()
+            new SvgImageBackEnd
         );
 
         $writer = new Writer($renderer);
@@ -259,7 +257,7 @@ class QrCodeController extends Controller
     private function extractSvgContent(string $svg): string
     {
         $svg = preg_replace('/<\?xml.*?\?>/s', '', $svg);
-        if (!$svg) {
+        if (! $svg) {
             return '';
         }
 
@@ -272,12 +270,12 @@ class QrCodeController extends Controller
 
     private function toDataUri(string $path): ?string
     {
-        if (!is_file($path)) {
+        if (! is_file($path)) {
             return null;
         }
 
         $mime = mime_content_type($path);
-        if (!$mime) {
+        if (! $mime) {
             return null;
         }
 
@@ -286,7 +284,6 @@ class QrCodeController extends Controller
             return null;
         }
 
-        return 'data:' . $mime . ';base64,' . base64_encode($contents);
+        return 'data:'.$mime.';base64,'.base64_encode($contents);
     }
 }
-

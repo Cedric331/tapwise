@@ -99,4 +99,3 @@ class StripeWebhookController extends CashierController
         return parent::handleInvoicePaymentSucceeded($payload);
     }
 }
-

@@ -17,9 +17,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BeerController extends Controller
 {
-    public function __construct(private readonly BeerImportService $beerImportService)
-    {
-    }
+    public function __construct(private readonly BeerImportService $beerImportService) {}
+
     /**
      * Display a listing of beers for a bar.
      */
@@ -193,4 +192,3 @@ class BeerController extends Controller
 
     //
 }
-

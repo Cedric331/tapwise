@@ -143,4 +143,3 @@ class Bar extends Model
         return url("/b/{$this->slug}");
     }
 }
-

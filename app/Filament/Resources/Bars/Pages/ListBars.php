@@ -17,4 +17,3 @@ class ListBars extends ListRecords
         ];
     }
 }
-

@@ -281,10 +281,6 @@ const isQuestionDisabled = (questionId: string) =>
                                 </div>
                             </label>
                         </div>
-
-                        <p class="mt-4 text-xs text-gray-500">
-                            Par défaut, les questions actuelles sont conservées tant que vous ne modifiez pas cette sélection.
-                        </p>
                     </div>
 
                     <!-- QR Code Toggle -->

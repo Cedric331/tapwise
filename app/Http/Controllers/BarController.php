@@ -129,4 +129,3 @@ class BarController extends Controller
         return redirect()->route('bars.index');
     }
 }
-

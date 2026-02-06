@@ -12,7 +12,6 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 // Public routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

@@ -14,8 +14,7 @@ class TrialEndingSoon extends Mailable
     public function __construct(
         public User $user,
         public int $daysLeft
-    ) {
-    }
+    ) {}
 
     public function build(): self
     {
@@ -24,4 +23,3 @@ class TrialEndingSoon extends Mailable
             ->view('emails.trial-ending-soon');
     }
 }
-

@@ -149,4 +149,3 @@ class RecommendationQuestions
         return $active;
     }
 }
-

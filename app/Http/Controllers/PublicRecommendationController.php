@@ -16,8 +16,7 @@ class PublicRecommendationController extends Controller
 {
     public function __construct(
         protected BeerRecommendationService $recommendationService
-    ) {
-    }
+    ) {}
 
     /**
      * Display the public recommendation page for a bar.
@@ -164,7 +163,7 @@ class PublicRecommendationController extends Controller
         }
 
         if (in_array('max_price', $selectedQuestions, true)) {
-            $rules['max_price'] = ['required', 'numeric', 'min:0', 'max:' . $maxPriceEuros];
+            $rules['max_price'] = ['required', 'numeric', 'min:0', 'max:'.$maxPriceEuros];
         }
 
         $validated = $request->validate($rules);
@@ -191,4 +190,3 @@ class PublicRecommendationController extends Controller
         ]);
     }
 }
-

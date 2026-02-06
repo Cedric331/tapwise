@@ -22,11 +22,13 @@ class AdminStatsOverview extends StatsOverviewWidget
             $status = $bar->subscriptionStatus();
             if ($status === 'active') {
                 $subscribed++;
+
                 continue;
             }
 
             if ($status === 'trial') {
                 $trial++;
+
                 continue;
             }
 
@@ -42,4 +44,3 @@ class AdminStatsOverview extends StatsOverviewWidget
         ];
     }
 }
-

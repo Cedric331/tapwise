@@ -23,4 +23,3 @@ class ListBeers extends ListRecords
         ];
     }
 }
-

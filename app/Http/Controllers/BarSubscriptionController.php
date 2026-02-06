@@ -98,4 +98,3 @@ class BarSubscriptionController extends Controller
         );
     }
 }
-

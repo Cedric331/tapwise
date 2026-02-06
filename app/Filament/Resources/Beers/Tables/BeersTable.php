@@ -27,10 +27,10 @@ class BeersTable
                     ->label('Couleur'),
                 TextColumn::make('abv_x10')
                     ->label('ABV')
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 10, 1, ',', ' ') . ' %' : '-'),
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 10, 1, ',', ' ').' %' : '-'),
                 TextColumn::make('price')
                     ->label('Prix')
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 100, 2, ',', ' ') . ' €' : '-'),
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 100, 2, ',', ' ').' €' : '-'),
                 IconColumn::make('is_on_tap')
                     ->label('Pression')
                     ->boolean(),
@@ -55,4 +55,3 @@ class BeersTable
             ]);
     }
 }
-

@@ -50,4 +50,3 @@ class BeerResource extends Resource
         ];
     }
 }
-
