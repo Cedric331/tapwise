@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bar;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SitemapController extends Controller
 {
@@ -20,22 +21,37 @@ class SitemapController extends Controller
             ['loc' => route('legal.contact'), 'lastmod' => $now],
         ];
 
-        $bars = Bar::where('qr_enabled', true)->get();
+        try {
+            $bars = Bar::where('qr_enabled', true)->get();
 
-        foreach ($bars as $bar) {
-            if (! $bar->hasActiveAccess()) {
-                continue;
+            foreach ($bars as $bar) {
+                try {
+                    if (! $bar->hasActiveAccess()) {
+                        continue;
+                    }
+
+                    $urls[] = [
+                        'loc' => route('public.bar.show', ['slug' => $bar->slug]),
+                        'lastmod' => $bar->updated_at ?? $now,
+                    ];
+                } catch (\Throwable $exception) {
+                    Log::warning('Sitemap bar skipped due to error.', [
+                        'bar_id' => $bar->id,
+                        'error' => $exception->getMessage(),
+                    ]);
+                }
             }
-
-            $urls[] = [
-                'loc' => route('public.bar.show', ['slug' => $bar->slug]),
-                'lastmod' => $bar->updated_at ?? $now,
-            ];
+        } catch (\Throwable $exception) {
+            Log::error('Sitemap bar listing failed.', [
+                'error' => $exception->getMessage(),
+            ]);
         }
 
         $xml = $this->buildXml($urls);
 
-        return response($xml, 200)->header('Content-Type', 'application/xml');
+        return response($xml, 200)
+            ->header('Content-Type', 'application/xml; charset=UTF-8')
+            ->header('Cache-Control', 'public, max-age=3600');
     }
 
     /**
