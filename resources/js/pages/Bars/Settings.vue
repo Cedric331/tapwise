@@ -242,13 +242,13 @@ const isQuestionDisabled = (questionId: string) =>
                             </div>
                             <div>
                                 <h2 class="text-lg font-semibold text-gray-900">Questions de recommandation</h2>
-                                <p class="text-sm text-gray-500">Sélectionnez entre 3 et 10 questions à poser</p>
+                                <p class="text-sm text-gray-500">Sélectionnez entre 3 et 8 questions à poser</p>
                             </div>
                         </div>
 
                         <div class="mb-4 flex flex-wrap items-center gap-3 text-xs font-medium text-amber-800">
                             <span class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1">
-                                {{ selectedQuestionCount }} / 10 sélectionnées
+                                {{ selectedQuestionCount }} / 8 sélectionnées
                             </span>
                             <span
                                 v-if="!hasMinimumQuestions"
