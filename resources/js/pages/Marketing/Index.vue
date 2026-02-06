@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { QrCode, Users, TrendingUp, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Clock, Heart, Star, MessageSquare } from 'lucide-vue-next';
 import { login, register } from '@/routes';
@@ -41,6 +41,8 @@ const schemaOrgJson = JSON.stringify({
         },
     ],
 });
+const schemaScriptId = 'schema-org-tapwise';
+let schemaScriptEl: HTMLScriptElement | null = null;
 const form = useForm({
     name: '',
     email: '',
@@ -49,6 +51,7 @@ const form = useForm({
 });
 
 const notification = ref<{ type: 'success' | 'error'; message: string } | null>(null);
+const isMobileMenuOpen = ref(false);
 let notificationTimer: number | null = null;
 
 const showNotification = (type: 'success' | 'error', message: string) => {
@@ -79,7 +82,24 @@ const submitContact = () => {
     });
 };
 
+const toggleMobileMenu = () => {
+    isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+const closeMobileMenu = () => {
+    isMobileMenuOpen.value = false;
+};
+
 onMounted(() => {
+    if (!document.getElementById(schemaScriptId)) {
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = schemaScriptId;
+        script.text = schemaOrgJson;
+        document.head.appendChild(script);
+        schemaScriptEl = script;
+    }
+
     const video = document.querySelector<HTMLVideoElement>('video[data-src]');
     if (!video) {
         return;
@@ -108,6 +128,13 @@ onMounted(() => {
 
     observer.observe(video);
 });
+
+onBeforeUnmount(() => {
+    if (schemaScriptEl && schemaScriptEl.parentNode) {
+        schemaScriptEl.parentNode.removeChild(schemaScriptEl);
+        schemaScriptEl = null;
+    }
+});
 </script>
 
 <template>
@@ -131,10 +158,9 @@ onMounted(() => {
         <meta name="twitter:description" content="QR code et recommandations pour la carte des bières." />
         <meta name="twitter:image" :content="ogImage" />
         <link rel="canonical" :href="baseUrl" />
-        <script type="application/ld+json" v-text="schemaOrgJson"></script>
     </Head>
 
-    <div class="min-h-screen bg-[#FDFDFC] text-[#1b1b18]">
+    <div class="min-h-screen overflow-x-hidden bg-[#FDFDFC] text-[#1b1b18]">
         <!-- Navigation -->
         <nav class="sticky top-0 z-50 border-b border-amber-100/50 bg-white/95 backdrop-blur-md">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -165,6 +191,79 @@ onMounted(() => {
                             Commencer
                         </Link>
                     </div>
+                    <button
+                        type="button"
+                        class="inline-flex items-center justify-center rounded-lg border border-amber-100 bg-white p-2 text-amber-900 shadow-sm transition hover:bg-amber-50 md:hidden"
+                        aria-label="Menu"
+                        aria-controls="mobile-menu"
+                        :aria-expanded="isMobileMenuOpen"
+                        @click="toggleMobileMenu"
+                    >
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                v-show="!isMobileMenuOpen"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                            <path
+                                v-show="isMobileMenuOpen"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <div
+                    id="mobile-menu"
+                    class="md:hidden"
+                    :class="isMobileMenuOpen ? 'block' : 'hidden'"
+                >
+                    <div class="flex flex-col gap-2 pb-6 pt-2">
+                        <a
+                            href="#fonctionnement"
+                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
+                            @click="closeMobileMenu"
+                        >
+                            Fonctionnement
+                        </a>
+                        <a
+                            href="#avantages"
+                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
+                            @click="closeMobileMenu"
+                        >
+                            Avantages
+                        </a>
+                        <a
+                            href="#tarifs"
+                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
+                            @click="closeMobileMenu"
+                        >
+                            Tarifs
+                        </a>
+                        <Link
+                            :href="demoUrl"
+                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
+                            @click="closeMobileMenu"
+                        >
+                            Démo
+                        </Link>
+                        <Link
+                            :href="login()"
+                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
+                            @click="closeMobileMenu"
+                        >
+                            Connexion
+                        </Link>
+                        <Link
+                            :href="register()"
+                            class="mt-1 inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md hover:from-amber-600 hover:to-orange-700"
+                            @click="closeMobileMenu"
+                        >
+                            Commencer
+                        </Link>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -189,7 +288,7 @@ onMounted(() => {
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
                     <!-- Contenu texte -->
                     <div class="text-center lg:text-left">
-                        <h1 class="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl">
+                        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl">
                             Logiciel de recommandations de bières pour bars
                             <span class="block text-amber-800">QR code & carte des bières optimisée</span>
                         </h1>
