@@ -10,6 +10,37 @@ const baseUrl = 'https://app.tapwise.fr';
 const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
 const heroPoster = '/assets/hero-video.png';
 const heroVideoSrc = '/assets/hero-video.mp4';
+const schemaOrgJson = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+        {
+            '@type': 'Organization',
+            name: 'Tapwise',
+            url: baseUrl,
+            logo: `${baseUrl}/assets/logo.svg`,
+        },
+        {
+            '@type': 'WebSite',
+            name: 'Tapwise',
+            url: baseUrl,
+            inLanguage: 'fr-FR',
+        },
+        {
+            '@type': 'SoftwareApplication',
+            name: 'Tapwise',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Web',
+            url: baseUrl,
+            description:
+                'Logiciel de recommandations de bières pour bars et caves avec QR code.',
+            offers: {
+                '@type': 'Offer',
+                price: '29.99',
+                priceCurrency: 'EUR',
+            },
+        },
+    ],
+});
 const form = useForm({
     name: '',
     email: '',
@@ -100,6 +131,7 @@ onMounted(() => {
         <meta name="twitter:description" content="QR code et recommandations pour la carte des bières." />
         <meta name="twitter:image" :content="ogImage" />
         <link rel="canonical" :href="baseUrl" />
+        <script type="application/ld+json" v-text="schemaOrgJson"></script>
     </Head>
 
     <div class="min-h-screen bg-[#FDFDFC] text-[#1b1b18]">
