@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/password/confirm';
 import { QrCode, Shield } from 'lucide-vue-next';
+import AppLogo from '@/components/AppLogo.vue';
 </script>
 
 <template>
@@ -16,9 +17,7 @@ import { QrCode, Shield } from 'lucide-vue-next';
                 <!-- Logo et titre -->
                 <div class="mb-10 text-center">
                     <div class="mb-6 flex justify-center">
-                        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-800 shadow-md">
-                            <QrCode class="h-7 w-7 text-white" />
-                        </div>
+                        <AppLogo class="h-14 w-14 text-white" />
                     </div>
                     <div class="mb-4 flex justify-center">
                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
