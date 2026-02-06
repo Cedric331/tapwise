@@ -346,7 +346,7 @@ const startSubscription = () => {
                     </div>
                     <h3 class="mt-6 text-xl font-semibold text-gray-900">Aucune bière</h3>
                     <p class="mt-2 text-sm text-gray-600">Commencez par ajouter votre première bière à votre catalogue.</p>
-                    <p class="mt-3 text-xs font-medium text-amber-800">Astuce : 3 références suffisent pour des recommandations efficaces.</p>
+                    <p class="mt-3 text-xs font-medium text-amber-800">Astuce : 5 à 7 références suffisent pour des recommandations efficaces.</p>
                     <Link
                         v-if="!bar.is_demo"
                         :href="`/bars/${bar.slug}/beers/create`"
