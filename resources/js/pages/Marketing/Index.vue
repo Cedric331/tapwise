@@ -402,7 +402,7 @@ const demoUrl = '/b/demo';
                     <div class="w-full max-w-md rounded-3xl border-2 border-amber-200 bg-white p-10 shadow-xl">
                         <div class="text-center">
                             <div class="inline-flex items-baseline">
-                                <span class="text-6xl font-bold text-gray-900">29€</span>
+                                <span class="text-6xl font-bold text-gray-900">29,99€</span>
                                 <span class="ml-2 text-2xl text-gray-600">/mois</span>
                             </div>
                             <p class="mt-4 text-gray-600">

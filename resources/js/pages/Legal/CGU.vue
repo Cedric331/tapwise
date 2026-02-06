@@ -83,7 +83,7 @@ import { ArrowLeft, FileText, AlertCircle } from 'lucide-vue-next';
                         <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Tarification et facturation</h2>
                         <div class="space-y-4 text-gray-700">
                             <p>
-                                L'abonnement à Tapwise est facturé mensuellement au prix de 29€ TTC (tarif fondateur).
+                                L'abonnement à Tapwise est facturé mensuellement au prix de 29,99€ TTC (tarif fondateur).
                             </p>
                             <p>
                                 Le paiement est effectué par carte bancaire ou autre moyen de paiement accepté. 
@@ -167,8 +167,7 @@ import { ArrowLeft, FileText, AlertCircle } from 'lucide-vue-next';
                         <h2 class="text-2xl font-semibold text-gray-900 mb-4">13. Contact</h2>
                         <p class="text-gray-700">
                             Pour toute question concernant les présentes CGU, vous pouvez nous contacter à : 
-                            <a href="mailto:contact@tapwise.fr" class="text-indigo-600 hover:text-indigo-700">contact@tapwise.fr</a>
-                            ou via notre <Link href="/contact" class="text-indigo-600 hover:text-indigo-700">formulaire de contact</Link>.
+                            <a href="mailto:limacedric@hotmail.fr" class="text-indigo-600 hover:text-indigo-700">limacedric@hotmail.fr</a>
                         </p>
                     </section>
                 </div>
