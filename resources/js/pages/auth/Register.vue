@@ -39,7 +39,7 @@ const previewUrl = computed(() => {
                 <!-- Logo et titre -->
                 <div class="mb-10 text-center">
                     <div class="mb-6 flex justify-center">
-                        <AppLogo class="h-14 w-14 text-white" />
+                        <AppLogo class="h-16 w-16 text-white" />
                     </div>
                     <h1 class="text-3xl font-bold text-gray-900">Créer un compte bar</h1>
                     <p class="mt-3 text-sm text-gray-600">

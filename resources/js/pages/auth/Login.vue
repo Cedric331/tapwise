@@ -27,9 +27,7 @@ defineProps<{
                 <!-- Logo et titre -->
                 <div class="mb-10 text-center">
                     <div class="mb-6 flex justify-center">
-                        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-800 shadow-md">
-                            <AppLogo class="h-7 w-7 text-white" />
-                        </div>
+                        <AppLogo class="h-16 w-16 text-white" />
                     </div>
                     <h1 class="text-3xl font-bold text-gray-900">Connexion</h1>
                     <p class="mt-3 text-sm text-gray-600">

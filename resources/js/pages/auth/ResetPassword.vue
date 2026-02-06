@@ -25,7 +25,7 @@ const inputEmail = ref(props.email);
                 <!-- Logo et titre -->
                 <div class="mb-10 text-center">
                     <div class="mb-6 flex justify-center">
-                        <AppLogo class="h-14 w-14 text-white" />
+                        <AppLogo class="h-16 w-16 text-white" />
                     </div>
                     <div class="mb-4 flex justify-center">
                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
