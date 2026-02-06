@@ -98,7 +98,7 @@ const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
                         <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Tarification et facturation</h2>
                         <div class="space-y-4 text-gray-700">
                             <p>
-                                L'abonnement à Tapwise est facturé mensuellement au prix de 29,99€ TTC (tarif fondateur).
+                                L'abonnement à Tapwise est facturé mensuellement au prix de 19,99€ TTC (tarif fondateur).
                             </p>
                             <p>
                                 Le paiement est effectué par carte bancaire ou autre moyen de paiement accepté. 
