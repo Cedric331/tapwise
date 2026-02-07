@@ -46,6 +46,29 @@ const formatDate = (value: string | null) => {
     }).format(date);
 };
 
+const escapeHtml = (value: string) =>
+    value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+const renderedContent = computed(() => {
+    const content = props.post.content ?? '';
+    if (/<\/?[a-z][\s\S]*>/i.test(content)) {
+        return content;
+    }
+
+    const safe = escapeHtml(content.trim());
+    if (!safe) return '';
+
+    return safe
+        .split(/\n{2,}/)
+        .map((paragraph) => `<p>${paragraph.replace(/\n/g, '<br />')}</p>`)
+        .join('');
+});
+
 const copyShareLink = async () => {
     try {
         await navigator.clipboard.writeText(pageUrl);
@@ -178,7 +201,7 @@ const copyShareLink = async () => {
                             {{ copyMessage }}
                         </p>
                     </div>
-                    <div class="prose prose-amber mt-8 max-w-none text-gray-700" v-html="props.post.content"></div>
+                    <div class="blog-content mt-8 max-w-none text-gray-700" v-html="renderedContent"></div>
                 </div>
             </article>
         </section>
