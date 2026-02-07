@@ -33,7 +33,19 @@ class BlogPostsTable
                     ->boolean(),
                 TextColumn::make('tags')
                     ->label('Tags')
-                    ->formatStateUsing(fn ($state) => implode(', ', $state ?? []))
+                    ->formatStateUsing(function ($state) {
+                        if (is_string($state)) {
+                            $decoded = json_decode($state, true);
+                            if (is_array($decoded)) {
+                                return implode(', ', $decoded);
+                            }
+
+                            $parts = array_filter(array_map('trim', explode(',', $state)));
+                            return implode(', ', $parts);
+                        }
+
+                        return implode(', ', $state ?? []);
+                    })
                     ->wrap(),
                 TextColumn::make('updated_at')
                     ->dateTime()
