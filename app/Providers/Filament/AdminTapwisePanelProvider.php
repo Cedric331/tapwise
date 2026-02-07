@@ -29,6 +29,7 @@ class AdminTapwisePanelProvider extends PanelProvider
             ->id('admin-tapwise')
             ->path('admin-tapwise')
             ->login()
+            ->profile()
             ->colors([
                 'primary' => Color::Amber,
             ])
