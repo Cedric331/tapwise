@@ -4,9 +4,10 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { QrCode, Users, TrendingUp, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Clock, Heart, Star, MessageSquare } from 'lucide-vue-next';
 import { login, register } from '@/routes';
 import AppLogo from '@/components/AppLogo.vue';
+import MarketingNavbar from '@/components/MarketingNavbar.vue';
 
 const demoUrl = '/b/demo';
-const baseUrl = 'https://app.tapwise.fr';
+const baseUrl = 'https://tapwise.fr';
 const ogImage = `${baseUrl}/assets/illustration-beer-glass.png`;
 const heroPoster = '/assets/hero-video.png';
 const heroVideoSrc = '/assets/hero-video.mp4';
@@ -51,7 +52,8 @@ const form = useForm({
 });
 
 const notification = ref<{ type: 'success' | 'error'; message: string } | null>(null);
-const isMobileMenuOpen = ref(false);
+const showCookieBanner = ref(false);
+const cookieConsentKey = 'tapwise_cookie_consent';
 let notificationTimer: number | null = null;
 
 const showNotification = (type: 'success' | 'error', message: string) => {
@@ -82,12 +84,13 @@ const submitContact = () => {
     });
 };
 
-const toggleMobileMenu = () => {
-    isMobileMenuOpen.value = !isMobileMenuOpen.value;
-};
-
-const closeMobileMenu = () => {
-    isMobileMenuOpen.value = false;
+const setCookieConsent = (value: 'accepted' | 'refused') => {
+    try {
+        localStorage.setItem(cookieConsentKey, value);
+    } catch (error) {
+        // Ignore storage errors (private mode or disabled storage).
+    }
+    showCookieBanner.value = false;
 };
 
 onMounted(() => {
@@ -127,6 +130,14 @@ onMounted(() => {
     );
 
     observer.observe(video);
+
+    try {
+        if (!localStorage.getItem(cookieConsentKey)) {
+            showCookieBanner.value = true;
+        }
+    } catch (error) {
+        showCookieBanner.value = true;
+    }
 });
 
 onBeforeUnmount(() => {
@@ -162,111 +173,7 @@ onBeforeUnmount(() => {
 
     <div class="min-h-screen overflow-x-hidden bg-[#FDFDFC] text-[#1b1b18]">
         <!-- Navigation -->
-        <nav class="sticky top-0 z-50 border-b border-amber-100/50 bg-white/95 backdrop-blur-md">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-20 items-center justify-between">
-                    <Link href="/" class="inline-flex items-center gap-1 flex-nowrap">
-                        <AppLogo class="h-12 w-12 p-0 -mr-1 shrink-0" />
-                    </Link>
-                    <div class="hidden md:flex md:items-center md:gap-8">
-                        <a href="#fonctionnement" class="text-sm font-medium text-gray-700 transition-colors hover:text-amber-800">
-                            Fonctionnement
-                        </a>
-                        <a href="#avantages" class="text-sm font-medium text-gray-700 transition-colors hover:text-amber-800">
-                            Avantages
-                        </a>
-                        <a href="#tarifs" class="text-sm font-medium text-gray-700 transition-colors hover:text-amber-800">
-                            Tarifs
-                        </a>
-                        <Link :href="demoUrl" class="text-sm font-medium text-gray-700 transition-colors hover:text-amber-800">
-                            Démo
-                        </Link>
-                        <Link :href="login()" class="text-sm font-medium text-gray-700 transition-colors hover:text-amber-800">
-                            Connexion
-                        </Link>
-                        <Link
-                            :href="register()"
-                            class="rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md hover:from-amber-600 hover:to-orange-700"
-                        >
-                            Commencer
-                        </Link>
-                    </div>
-                    <button
-                        type="button"
-                        class="inline-flex items-center justify-center rounded-lg border border-amber-100 bg-white p-2 text-amber-900 shadow-sm transition hover:bg-amber-50 md:hidden"
-                        aria-label="Menu"
-                        aria-controls="mobile-menu"
-                        :aria-expanded="isMobileMenuOpen"
-                        @click="toggleMobileMenu"
-                    >
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path
-                                v-show="!isMobileMenuOpen"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 6h16M4 12h16M4 18h16"
-                            />
-                            <path
-                                v-show="isMobileMenuOpen"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                </div>
-                <div
-                    id="mobile-menu"
-                    class="md:hidden"
-                    :class="isMobileMenuOpen ? 'block' : 'hidden'"
-                >
-                    <div class="flex flex-col gap-2 pb-6 pt-2">
-                        <a
-                            href="#fonctionnement"
-                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
-                            @click="closeMobileMenu"
-                        >
-                            Fonctionnement
-                        </a>
-                        <a
-                            href="#avantages"
-                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
-                            @click="closeMobileMenu"
-                        >
-                            Avantages
-                        </a>
-                        <a
-                            href="#tarifs"
-                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
-                            @click="closeMobileMenu"
-                        >
-                            Tarifs
-                        </a>
-                        <Link
-                            :href="demoUrl"
-                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
-                            @click="closeMobileMenu"
-                        >
-                            Démo
-                        </Link>
-                        <Link
-                            :href="login()"
-                            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
-                            @click="closeMobileMenu"
-                        >
-                            Connexion
-                        </Link>
-                        <Link
-                            :href="register()"
-                            class="mt-1 inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md hover:from-amber-600 hover:to-orange-700"
-                            @click="closeMobileMenu"
-                        >
-                            Commencer
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        <MarketingNavbar active="home" />
 
         <!-- Hero Section -->
         <section class="relative overflow-hidden min-h-[90vh] flex items-center">
@@ -780,6 +687,11 @@ onBeforeUnmount(() => {
                                 </a>
                             </li>
                             <li>
+                                <Link href="/blog" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                    Blog
+                                </Link>
+                            </li>
+                            <li>
                                 <Link :href="demoUrl" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
                                     Démo
                                 </Link>
@@ -822,6 +734,39 @@ onBeforeUnmount(() => {
                 </div>
             </div>
         </footer>
+
+        <div
+            v-if="showCookieBanner"
+            class="fixed inset-x-4 bottom-6 z-50 mx-auto max-w-5xl rounded-2xl border border-amber-100 bg-white p-6 shadow-xl"
+        >
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="text-sm text-gray-600">
+                    <p class="font-semibold text-gray-900">Cookies & confidentialité</p>
+                    <p>
+                        Nous utilisons des cookies essentiels pour le bon fonctionnement du site.
+                        <Link href="/politique-de-confidentialite" class="text-amber-700 hover:text-amber-800">
+                            En savoir plus
+                        </Link>
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button
+                        type="button"
+                        class="rounded-lg border border-amber-200 px-4 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
+                        @click="setCookieConsent('refused')"
+                    >
+                        Refuser
+                    </button>
+                    <button
+                        type="button"
+                        class="rounded-lg bg-amber-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-900"
+                        @click="setCookieConsent('accepted')"
+                    >
+                        Tout accepter
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div
             v-if="notification"

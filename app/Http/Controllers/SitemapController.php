@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bar;
+use App\Models\BlogPost;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +16,7 @@ class SitemapController extends Controller
 
         $urls = [
             ['loc' => route('home'), 'lastmod' => $now],
+            ['loc' => route('blog.index'), 'lastmod' => $now],
             ['loc' => route('legal.mentions'), 'lastmod' => $now],
             ['loc' => route('legal.confidentialite'), 'lastmod' => $now],
             ['loc' => route('legal.cgu'), 'lastmod' => $now],
@@ -43,6 +45,24 @@ class SitemapController extends Controller
             }
         } catch (\Throwable $exception) {
             Log::error('Sitemap bar listing failed.', [
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        try {
+            $posts = BlogPost::query()
+                ->where('is_live', true)
+                ->orderByDesc('published_at')
+                ->get();
+
+            foreach ($posts as $post) {
+                $urls[] = [
+                    'loc' => route('blog.show', ['slug' => $post->slug]),
+                    'lastmod' => $post->updated_at ?? $now,
+                ];
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Sitemap blog listing failed.', [
                 'error' => $exception->getMessage(),
             ]);
         }

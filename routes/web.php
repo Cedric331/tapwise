@@ -4,6 +4,7 @@ use App\Http\Controllers\BarController;
 use App\Http\Controllers\BarSettingsController;
 use App\Http\Controllers\BarSubscriptionController;
 use App\Http\Controllers\BeerController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\PublicRecommendationController;
@@ -16,6 +17,8 @@ use Inertia\Inertia;
 // Public routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/', [MarketingController::class, 'index'])->name('home');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/b/{slug}', [PublicRecommendationController::class, 'show'])->name('public.bar.show');
 Route::post('/b/{slug}/recommend', [PublicRecommendationController::class, 'recommend'])->name('public.bar.recommend');
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
