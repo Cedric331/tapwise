@@ -30,4 +30,3 @@ enum WineColor: string
             ->toArray();
     }
 }
-

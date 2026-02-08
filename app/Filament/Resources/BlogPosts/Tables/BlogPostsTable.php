@@ -41,6 +41,7 @@ class BlogPostsTable
                             }
 
                             $parts = array_filter(array_map('trim', explode(',', $state)));
+
                             return implode(', ', $parts);
                         }
 
@@ -65,4 +66,3 @@ class BlogPostsTable
             ]);
     }
 }
-

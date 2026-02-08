@@ -40,4 +40,3 @@ class WineUpdateRequest extends FormRequest
         ];
     }
 }
-

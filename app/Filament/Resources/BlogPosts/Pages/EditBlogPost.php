@@ -9,4 +9,3 @@ class EditBlogPost extends EditRecord
 {
     protected static string $resource = BlogPostResource::class;
 }
-

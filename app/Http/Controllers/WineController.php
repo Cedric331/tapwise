@@ -65,7 +65,7 @@ class WineController extends Controller
             'Bordeaux',
             'viande_rouge,fromage',
             '12.5',
-            "Fruits rouges et notes boisées",
+            'Fruits rouges et notes boisées',
             'oui',
             '7.50',
         ];
@@ -191,4 +191,3 @@ class WineController extends Controller
             ->with('success', 'Vin supprimé avec succès.');
     }
 }
-

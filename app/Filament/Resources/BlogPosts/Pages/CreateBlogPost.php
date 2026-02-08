@@ -9,4 +9,3 @@ class CreateBlogPost extends CreateRecord
 {
     protected static string $resource = BlogPostResource::class;
 }
-

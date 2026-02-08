@@ -22,4 +22,3 @@ class BarScanEvent extends Model
         return $this->belongsTo(Bar::class);
     }
 }
-

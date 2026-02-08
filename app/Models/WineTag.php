@@ -38,4 +38,3 @@ class WineTag extends Model
         });
     }
 }
-

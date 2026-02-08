@@ -63,4 +63,3 @@ class Wine extends Model
         return $this->price ? $this->price / 100 : null;
     }
 }
-

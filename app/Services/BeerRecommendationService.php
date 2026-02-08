@@ -11,9 +11,13 @@ use Illuminate\Support\Collection;
 class BeerRecommendationService
 {
     private const TOLERANCE_RATIO = 0.10;
+
     private const ABV_TOLERANCE_ABS = 0.5;
+
     private const PRICE_TOLERANCE_ABS = 0.5;
+
     private const NEAR_WEIGHT = 0.5;
+
     private const QUALITY_THRESHOLD = 0.9;
 
     /**

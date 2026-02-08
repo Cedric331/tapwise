@@ -28,4 +28,3 @@ class RecommendationEvent extends Model
         return $this->belongsTo(Bar::class);
     }
 }
-

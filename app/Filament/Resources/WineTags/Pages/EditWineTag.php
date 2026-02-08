@@ -9,4 +9,3 @@ class EditWineTag extends EditRecord
 {
     protected static string $resource = WineTagResource::class;
 }
-

@@ -50,4 +50,3 @@ class WineTagResource extends Resource
         ];
     }
 }
-

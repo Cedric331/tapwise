@@ -9,4 +9,3 @@ class CreateWineTag extends CreateRecord
 {
     protected static string $resource = WineTagResource::class;
 }
-

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\BeerColor;
 use App\Enums\WineColor;
-use App\Models\BarScanEvent;
 use App\Models\Bar;
+use App\Models\BarScanEvent;
 use App\Models\RecommendationEvent;
 use App\Services\BeerRecommendationService;
 use App\Services\WineRecommendationService;
@@ -225,10 +225,12 @@ class PublicRecommendationController extends Controller
 
         $beers = $beers->map(function ($beer) use ($popularity) {
             $beer->popularity = $popularity['beer'][$beer->id] ?? 0;
+
             return $beer;
         });
         $wines = $wines->map(function ($wine) use ($popularity) {
             $wine->popularity = $popularity['wine'][$wine->id] ?? 0;
+
             return $wine;
         });
 

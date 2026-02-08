@@ -68,4 +68,3 @@ class BlogPost extends Model
         return $slug;
     }
 }
-
