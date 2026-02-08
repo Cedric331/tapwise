@@ -603,8 +603,9 @@ onBeforeUnmount(() => {
                         <form @submit.prevent="submitContact" class="space-y-5">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
+                                    <label for="marketing-name" class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
                                     <input
+                                        id="marketing-name"
                                         v-model="form.name"
                                         type="text"
                                         required
@@ -614,8 +615,9 @@ onBeforeUnmount(() => {
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                    <label for="marketing-email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                                     <input
+                                        id="marketing-email"
                                         v-model="form.email"
                                         type="email"
                                         required
@@ -626,8 +628,9 @@ onBeforeUnmount(() => {
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Sujet *</label>
+                                <label for="marketing-subject" class="block text-sm font-medium text-gray-700 mb-2">Sujet *</label>
                                 <input
+                                    id="marketing-subject"
                                     v-model="form.subject"
                                     type="text"
                                     required
@@ -636,8 +639,9 @@ onBeforeUnmount(() => {
                                 />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                                <label for="marketing-message" class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
                                 <textarea
+                                    id="marketing-message"
                                     v-model="form.message"
                                     rows="6"
                                     required
@@ -645,15 +649,15 @@ onBeforeUnmount(() => {
                                     placeholder="Parlez-nous de votre établissement…"
                                 />
                             </div>
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <input type="checkbox" required class="h-4 w-4 rounded border-gray-300" />
+                            <label for="marketing-consent" class="flex items-center gap-2 text-xs text-gray-500">
+                                <input id="marketing-consent" type="checkbox" required class="h-4 w-4 rounded border-gray-300" />
                                 <span>
                                     J'accepte que mes données soient utilisées pour répondre à ma demande.
-                                    <Link href="/politique-de-confidentialite" class="text-amber-700 hover:text-amber-800">
+                                    <Link href="/politique-de-confidentialite" class="text-amber-700 underline underline-offset-2 hover:text-amber-800">
                                         En savoir plus
                                     </Link>
                                 </span>
-                            </div>
+                            </label>
                             <button
                                 type="submit"
                                 class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
@@ -689,27 +693,27 @@ onBeforeUnmount(() => {
                         <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 mb-4">Produit</h3>
                         <ul class="space-y-3">
                             <li>
-                                <a href="#fonctionnement" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <a href="#fonctionnement" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     Fonctionnement
                                 </a>
                             </li>
                             <li>
-                                <a href="#avantages" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <a href="#avantages" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     Avantages
                                 </a>
                             </li>
                             <li>
-                                <a href="#tarifs" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <a href="#tarifs" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     Tarifs
                                 </a>
                             </li>
                             <li>
-                                <Link href="/blog" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <Link href="/blog" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     Blog
                                 </Link>
                             </li>
                             <li>
-                                <Link :href="demoUrl" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <Link :href="demoUrl" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     Démo
                                 </Link>
                             </li>
@@ -721,17 +725,17 @@ onBeforeUnmount(() => {
                         <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 mb-4">Légal</h3>
                         <ul class="space-y-3">
                             <li>
-                                <Link href="/mentions-legales" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <Link href="/mentions-legales" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     Mentions légales
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/politique-de-confidentialite" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <Link href="/politique-de-confidentialite" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     Confidentialité
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/cgu" class="text-sm text-gray-600 transition-colors hover:text-amber-800">
+                                <Link href="/cgu" class="text-sm text-gray-600 underline underline-offset-2 transition-colors hover:text-amber-800">
                                     CGU
                                 </Link>
                             </li>
@@ -758,7 +762,7 @@ onBeforeUnmount(() => {
                     <p class="font-semibold text-gray-900">Cookies & confidentialité</p>
                     <p>
                         Nous utilisons des cookies essentiels pour le bon fonctionnement du site.
-                        <Link href="/politique-de-confidentialite" class="text-amber-700 hover:text-amber-800">
+                        <Link href="/politique-de-confidentialite" class="text-amber-700 underline underline-offset-2 hover:text-amber-800">
                             En savoir plus
                         </Link>
                     </p>

@@ -162,7 +162,7 @@ const toggleTag = (tagId: number) => {
                             </div>
 
                             <div>
-                                <label class="mb-2 block text-sm font-medium text-gray-700">IBU (International Bitterness Units)</label>
+                                <label class="mb-2 block text-sm font-medium text-gray-700">IBU (amertume)</label>
                                 <input
                                     v-model.number="form.ibu"
                                     type="number"

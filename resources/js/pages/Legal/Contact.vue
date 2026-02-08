@@ -59,7 +59,7 @@ const submit = () => {
                             </div>
                             <div>
                                 <h3 class="font-semibold text-gray-900">Email</h3>
-                                <a href="mailto:contact@tapwise.fr" class="mt-1 text-sm text-gray-600 hover:text-indigo-600">
+                                <a href="mailto:contact@tapwise.fr" class="mt-1 text-sm text-gray-600 underline underline-offset-2 hover:text-indigo-600">
                                     contact@tapwise.fr
                                 </a>
                             </div>
@@ -92,8 +92,9 @@ const submit = () => {
                     <div class="rounded-xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
                         <form @submit.prevent="submit" class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
+                                <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-2">Nom complet *</label>
                                 <input
+                                    id="contact-name"
                                     v-model="form.name"
                                     type="text"
                                     required
@@ -103,8 +104,9 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                                 <input
+                                    id="contact-email"
                                     v-model="form.email"
                                     type="email"
                                     required
@@ -114,8 +116,9 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Sujet *</label>
+                                <label for="contact-subject" class="block text-sm font-medium text-gray-700 mb-2">Sujet *</label>
                                 <input
+                                    id="contact-subject"
                                     v-model="form.subject"
                                     type="text"
                                     required
@@ -125,8 +128,9 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                                <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
                                 <textarea
+                                    id="contact-message"
                                     v-model="form.message"
                                     rows="6"
                                     required
@@ -135,15 +139,15 @@ const submit = () => {
                                 />
                             </div>
 
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <input type="checkbox" required class="h-4 w-4 rounded border-gray-300" />
+                            <label for="contact-consent" class="flex items-center gap-2 text-xs text-gray-500">
+                                <input id="contact-consent" type="checkbox" required class="h-4 w-4 rounded border-gray-300" />
                                 <span>
                                     J'accepte que mes données soient utilisées pour répondre à ma demande. 
-                                    <Link href="/politique-de-confidentialite" class="text-indigo-600 hover:text-indigo-700">
+                                    <Link href="/politique-de-confidentialite" class="text-indigo-600 underline underline-offset-2 hover:text-indigo-700">
                                         En savoir plus
                                     </Link>
                                 </span>
-                            </div>
+                            </label>
 
                             <button
                                 type="submit"

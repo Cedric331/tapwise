@@ -131,14 +131,14 @@ const getAbv = (abvX10: number) => {
 
                             <div class="mt-4 flex flex-wrap gap-4 text-sm">
                                 <span>
-                                    <strong>ABV:</strong>
+                                    <strong>ABV (taux d'alcool):</strong>
                                     {{ getAbv(isWine ? recommendation.wine?.abv_x10 ?? 0 : recommendation.beer?.abv_x10 ?? 0) }}%
                                 </span>
                                 <span v-if="!isWine && recommendation.beer?.ibu">
-                                    <strong>IBU:</strong> {{ recommendation.beer.ibu }}
+                                    <strong>IBU (unités d'amertume):</strong> {{ recommendation.beer.ibu }}
                                 </span>
                                 <span v-if="(isWine ? recommendation.wine?.price : recommendation.beer?.price)">
-                                    <strong>Prix:</strong>
+                                    <strong>Prix (par verre/bouteille):</strong>
                                     {{ formatPrice(isWine ? recommendation.wine?.price : recommendation.beer?.price) }}
                                 </span>
                             </div>
