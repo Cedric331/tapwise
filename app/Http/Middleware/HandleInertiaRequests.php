@@ -55,6 +55,8 @@ class HandleInertiaRequests extends Middleware
                     'id' => $bar->id,
                     'name' => $bar->name,
                     'slug' => $bar->slug,
+                    'offers_beer' => $bar->offers_beer,
+                    'offers_wine' => $bar->offers_wine,
                 ];
 
                 if ($request->user()) {
@@ -73,6 +75,8 @@ class HandleInertiaRequests extends Middleware
                         'id' => $bar->id,
                         'name' => $bar->name,
                         'slug' => $bar->slug,
+                        'offers_beer' => $bar->offers_beer,
+                        'offers_wine' => $bar->offers_wine,
                     ];
                 }
             }

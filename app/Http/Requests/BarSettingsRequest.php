@@ -29,8 +29,12 @@ class BarSettingsRequest extends FormRequest
             'brand_primary_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'welcome_message' => ['nullable', 'string', 'max:500'],
             'qr_enabled' => ['boolean'],
+            'offers_beer' => ['boolean'],
+            'offers_wine' => ['boolean'],
             'recommendation_questions' => ['nullable', 'array', 'min:3', 'max:10'],
-            'recommendation_questions.*' => ['string', Rule::in(RecommendationQuestions::ids())],
+            'recommendation_questions.*' => ['string', Rule::in(RecommendationQuestions::ids('beer'))],
+            'recommendation_questions_wine' => ['nullable', 'array', 'min:3', 'max:10'],
+            'recommendation_questions_wine.*' => ['string', Rule::in(RecommendationQuestions::ids('wine'))],
         ];
     }
 }

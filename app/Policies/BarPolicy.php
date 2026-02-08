@@ -78,4 +78,16 @@ class BarPolicy
 
         return $this->update($user, $bar);
     }
+
+    /**
+     * Determine if the user can manage wines for the bar.
+     */
+    public function manageWines(User $user, Bar $bar): bool
+    {
+        if ($bar->is_demo) {
+            return false;
+        }
+
+        return $this->update($user, $bar);
+    }
 }

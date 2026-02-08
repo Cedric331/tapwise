@@ -8,6 +8,7 @@ interface Bar {
     name: string;
     slug: string;
     beers_count: number;
+    wines_count: number;
     is_demo: boolean;
     can_delete: boolean;
     subscription_status: 'active' | 'trial' | 'inactive';
@@ -56,7 +57,7 @@ const deleteBar = (bar: Bar) => {
                         <h1 class="text-4xl font-bold tracking-tight text-gray-900">Gérez vos établissements</h1>
                     </div>
                     <p class="mt-2 max-w-2xl text-gray-600">
-                        Centralisez vos bars, suivez votre catalogue de bières et accédez rapidement aux actions clés.
+                        Centralisez vos établissements, suivez vos catalogues et accédez rapidement aux actions clés.
                     </p>
                 </div>
 
@@ -118,7 +119,8 @@ const deleteBar = (bar: Bar) => {
                                 <div>
                                     <h2 class="text-xl font-bold text-gray-900">{{ bar.name }}</h2>
                                     <p class="mt-1 text-sm text-gray-500">
-                                        {{ bar.beers_count }} bière{{ bar.beers_count > 1 ? 's' : '' }}
+                                        {{ bar.beers_count }} bière{{ bar.beers_count > 1 ? 's' : '' }} ·
+                                        {{ bar.wines_count }} vin{{ bar.wines_count > 1 ? 's' : '' }}
                                     </p>
                                 </div>
                             </div>

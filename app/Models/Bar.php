@@ -19,9 +19,12 @@ class Bar extends Model
         'brand_primary_color',
         'welcome_message',
         'recommendation_questions',
+        'recommendation_questions_wine',
         'qr_enabled',
         'count_scans',
         'is_demo',
+        'offers_beer',
+        'offers_wine',
     ];
 
     protected $casts = [
@@ -29,6 +32,9 @@ class Bar extends Model
         'count_scans' => 'integer',
         'is_demo' => 'boolean',
         'recommendation_questions' => 'array',
+        'recommendation_questions_wine' => 'array',
+        'offers_beer' => 'boolean',
+        'offers_wine' => 'boolean',
     ];
 
     /**
@@ -116,11 +122,27 @@ class Bar extends Model
     }
 
     /**
+     * Get the wines for this bar.
+     */
+    public function wines(): HasMany
+    {
+        return $this->hasMany(Wine::class);
+    }
+
+    /**
      * Get the available beers for this bar.
      */
     public function availableBeers(): HasMany
     {
         return $this->beers()->where('is_available', true);
+    }
+
+    /**
+     * Get the available wines for this bar.
+     */
+    public function availableWines(): HasMany
+    {
+        return $this->wines()->where('is_available', true);
     }
 
     /**

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { QrCode, Users, TrendingUp, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Clock, Heart, Star, MessageSquare } from 'lucide-vue-next';
+import { QrCode, Users, TrendingUp, CheckCircle2, ArrowRight, Sparkles, Zap, Shield, Clock, Heart, Star, MessageSquare, Folder } from 'lucide-vue-next';
 import { login, register } from '@/routes';
 import AppLogo from '@/components/AppLogo.vue';
 import MarketingNavbar from '@/components/MarketingNavbar.vue';
@@ -33,10 +33,10 @@ const schemaOrgJson = JSON.stringify({
             operatingSystem: 'Web',
             url: baseUrl,
             description:
-                'Logiciel de recommandations de bières pour bars et caves avec QR code.',
+                'Logiciel de recommandations de boissons (bières & vins) pour établissements avec QR code.',
             offers: {
                 '@type': 'Offer',
-                price: '29.99',
+                price: '19.99',
                 priceCurrency: 'EUR',
             },
         },
@@ -150,23 +150,23 @@ onBeforeUnmount(() => {
 
 <template>
     <Head>
-        <title>Tapwise — Logiciel de recommandations de bières pour bars</title>
+        <title>Tapwise — Recommandations de bières & vins pour établissements</title>
         <meta
             name="description"
-            content="Logiciel de recommandations de bières pour bars et caves : QR code, carte des bières, suggestions clients personnalisées. Boostez l'expérience et les ventes."
+            content="Recommandations de bières et vins pour bars, restaurants et caves : QR code, catalogue, suggestions personnalisées. Boostez l'expérience et les ventes."
         />
-        <meta name="keywords" content="bar, cave, bière pression, carte des bières, QR code, recommandation client, logiciel bar, SaaS" />
+        <meta name="keywords" content="bar, restaurant, cave, vin, bière, carte des boissons, QR code, recommandation client, logiciel établissement, SaaS" />
         <meta name="author" content="Tapwise" />
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Tapwise — Logiciel de recommandations de bières pour bars" />
-        <meta property="og:description" content="QR code et carte des bières intelligente pour guider les clients et augmenter les ventes." />
+        <meta property="og:title" content="Tapwise — Recommandations de bières & vins" />
+        <meta property="og:description" content="QR code et catalogue intelligent pour guider les clients et augmenter les ventes." />
         <meta property="og:type" content="website" />
         <meta property="og:url" :content="baseUrl" />
         <meta property="og:image" :content="ogImage" />
-        <meta property="og:image:alt" content="Tapwise - logiciel de recommandations de bières pour bars" />
+        <meta property="og:image:alt" content="Tapwise - recommandations de boissons pour établissements" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Tapwise — Logiciel de recommandations de bières pour bars" />
-        <meta name="twitter:description" content="QR code et recommandations pour la carte des bières." />
+        <meta name="twitter:title" content="Tapwise — Recommandations de bières & vins" />
+        <meta name="twitter:description" content="QR code et recommandations pour votre carte des boissons." />
         <meta name="twitter:image" :content="ogImage" />
         <link rel="canonical" :href="baseUrl" />
     </Head>
@@ -196,11 +196,11 @@ onBeforeUnmount(() => {
                     <!-- Contenu texte -->
                     <div class="text-center lg:text-left">
                         <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl">
-                            Logiciel de recommandations de bières pour bars
-                            <span class="block text-amber-800">QR code & carte des bières optimisée</span>
+                            Recommandations de bières & vins pour établissements
+                            <span class="block text-amber-800">QR code & carte des boissons optimisée</span>
                         </h1>
                         <p class="mt-6 text-lg text-gray-600 leading-relaxed">
-                            Tapwise aide les bars et caves à guider leurs clients : QR code, questions rapides, recommandations personnalisées selon la carte des bières, en pression ou en bouteille.
+                            Tapwise aide les bars, restaurants et caves à guider leurs clients : QR code, questions rapides et recommandations personnalisées selon votre carte des boissons (bières & vins).
                         </p>
                         <div class="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
                             <Link
@@ -233,12 +233,12 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                     
-                    <!-- Illustration verre de bière -->
+                    <!-- Illustration verre -->
                     <!-- <div class="relative flex justify-center lg:justify-end">
                         <div class="relative">
                             <img 
                                 src="/assets/illustration-beer-glass.png" 
-                                alt="Verre de bière" 
+                                alt="Verre"
                                 class="h-auto w-full max-w-md"
                             />
                         </div>
@@ -275,10 +275,27 @@ onBeforeUnmount(() => {
                     
                     <!-- Étapes -->
                     <div class="space-y-10 order-1 lg:order-2">
+
                         <div class="flex gap-6">
                             <div class="flex-shrink-0">
                                 <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-800 text-white text-xl font-bold shadow-lg">
                                     01
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <Folder class="h-6 w-6 text-amber-800" />
+                                    <h3 class="text-xl font-bold text-gray-900">Importer votre carte</h3>
+                                </div>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Importez votre carte des boissons pour que Tapwise puisse les proposer à vos clients.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-800 text-white text-xl font-bold shadow-lg">
+                                    02
                                 </div>
                             </div>
                             <div>
@@ -295,7 +312,7 @@ onBeforeUnmount(() => {
                         <div class="flex gap-6">
                             <div class="flex-shrink-0">
                                 <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-800 text-white text-xl font-bold shadow-lg">
-                                    02
+                                    03
                                 </div>
                             </div>
                             <div>
@@ -312,16 +329,16 @@ onBeforeUnmount(() => {
                         <div class="flex gap-6">
                             <div class="flex-shrink-0">
                                 <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-800 text-white text-xl font-bold shadow-lg">
-                                    03
+                                    04
                                 </div>
                             </div>
                             <div>
                                 <div class="flex items-center gap-3 mb-3">
                                     <Sparkles class="h-6 w-6 text-amber-800" />
-                                    <h3 class="text-xl font-bold text-gray-900">La recommandation parfaite</h3>
+                                    <h3 class="text-xl font-bold text-gray-900">Recommandations personnalisées</h3>
                                 </div>
                                 <p class="text-gray-600 leading-relaxed">
-                                    Notre algorithme suggère 2 à 3 bières de votre carte, parfaitement adaptées aux goûts du client.
+                                    Notre algorithme suggère 2 à 3 boissons de votre carte, parfaitement adaptées aux goûts du client.
                                 </p>
                             </div>
                         </div>
@@ -400,7 +417,7 @@ onBeforeUnmount(() => {
                     <div class="rounded-2xl bg-[#FDFDFC] p-8 border border-amber-100">
                         <div class="text-6xl font-bold text-amber-200 mb-4 leading-none">"</div>
                         <p class="text-gray-700 leading-relaxed mb-6">
-                            Les clients adorent découvrir de nouvelles bières qu'ils n'auraient jamais osé commander autrement. Des petites améliorations à faire mais c'est top.
+                            Les clients adorent découvrir de nouvelles boissons qu'ils n'auraient jamais osé commander autrement. Des petites améliorations à faire mais c'est top.
                         </p>
                         <div class="border-t border-amber-100 pt-4">
                             <p class="font-semibold text-gray-900">Marie-Claire Dubois</p>
@@ -424,11 +441,11 @@ onBeforeUnmount(() => {
                     <div class="rounded-2xl bg-[#FDFDFC] p-8 border border-amber-100">
                         <div class="text-6xl font-bold text-amber-200 mb-4 leading-none">"</div>
                         <p class="text-gray-700 leading-relaxed mb-6">
-                           Cela permet de mettre en valeur notre sélection de bières. Merci
+                           Cela permet de mettre en valeur notre sélection de boissons. Merci
                         </p>
                         <div class="border-t border-amber-100 pt-4">
                             <p class="font-semibold text-gray-900">Benoit Conte</p>
-                            <p class="text-sm text-gray-600">Comptoir des Bières</p>
+                            <p class="text-sm text-gray-600">Comptoir des Boissons</p>
                             <p class="text-xs text-gray-500">Paris</p>
                         </div>
                     </div>
@@ -445,7 +462,7 @@ onBeforeUnmount(() => {
                         <p class="text-sm font-medium text-amber-800 mb-2">Une expérience unique</p>
                         <h2 class="text-4xl font-bold text-gray-900 mb-4">Découvrez Tapwise en action</h2>
                         <p class="text-lg text-gray-600 mb-8 leading-relaxed">
-                            Scannez le QR code avec votre smartphone pour vivre l'expérience client. En quelques secondes, découvrez comment Tapwise transforme la découverte de bières en un moment privilégié.
+                            Scannez le QR code avec votre smartphone pour vivre l'expérience client. En quelques secondes, découvrez comment Tapwise transforme la découverte de vins et bières en un moment privilégié.
                         </p>
                         
                         <!-- Étapes numérotées -->
@@ -540,7 +557,7 @@ onBeforeUnmount(() => {
                             </li>
                             <li class="flex items-start gap-4">
                                 <CheckCircle2 class="mt-0.5 h-6 w-6 flex-shrink-0 text-green-600" />
-                                <span class="text-gray-700 leading-relaxed">Gestion illimitée de votre carte des bières</span>
+                                <span class="text-gray-700 leading-relaxed">Gestion illimitée de votre carte des boissons</span>
                             </li>
                             <li class="flex items-start gap-4">
                                 <CheckCircle2 class="mt-0.5 h-6 w-6 flex-shrink-0 text-green-600" />
@@ -577,9 +594,9 @@ onBeforeUnmount(() => {
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
                     <div>
                         <p class="text-sm font-medium text-amber-800 mb-2">Contact</p>
-                        <h2 class="text-4xl font-bold text-gray-900 mb-4">Parlons de votre bar</h2>
+                        <h2 class="text-4xl font-bold text-gray-900 mb-4">Parlons de votre établissement</h2>
                         <p class="text-lg text-gray-600 leading-relaxed">
-                            Une question sur Tapwise ? Une démo pour votre carte des bières ? Écrivez-nous et nous répondons rapidement.
+                            Une question sur Tapwise ? Une démo pour votre carte des boissons ? Écrivez-nous et nous répondons rapidement.
                         </p>
                     </div>
                     <div class="rounded-2xl bg-white p-8 shadow-sm border border-amber-100">
@@ -593,7 +610,7 @@ onBeforeUnmount(() => {
                                         required
                                         autocomplete="name"
                                         class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                        placeholder="Jean Dupont"
+                                        placeholder="Nom"
                                     />
                                 </div>
                                 <div>
@@ -604,7 +621,7 @@ onBeforeUnmount(() => {
                                         required
                                         autocomplete="email"
                                         class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                        placeholder="jean@bar.fr"
+                                        placeholder="email@email.com"
                                     />
                                 </div>
                             </div>
@@ -663,7 +680,7 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
                         <p class="max-w-sm text-sm text-gray-600 leading-relaxed mb-6">
-                            Sublimez l'expérience de vos clients avec des recommandations de bières personnalisées.
+                            Sublimez l'expérience de vos clients avec des recommandations de boissons personnalisées.
                         </p>
                     </div>
 
@@ -726,9 +743,6 @@ onBeforeUnmount(() => {
                     <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
                         <p class="text-xs text-gray-500">
                             © {{ new Date().getFullYear() }} Tapwise. Tous droits réservés.
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            Fait avec passion pour les amateurs de bières
                         </p>
                     </div>
                 </div>

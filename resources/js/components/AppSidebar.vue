@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { BookOpen, Folder, Beer, LayoutGrid, Store, ChevronDown, CreditCard, AlertCircle } from 'lucide-vue-next';
+import { BookOpen, Folder, Beer, Wine, LayoutGrid, Store, ChevronDown, CreditCard, AlertCircle, TrendingUp, Settings, QrCode } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -27,7 +27,12 @@ import { type NavItem } from '@/types';
 import AppLogoIcon from './AppLogoIcon.vue';
 
 const page = usePage();
-const currentBar = computed(() => (page.props as any).currentBar as { id: number; name: string; slug: string } | undefined);
+const currentBar = computed(
+    () =>
+        (page.props as any).currentBar as
+            | { id: number; name: string; slug: string; offers_beer?: boolean; offers_wine?: boolean }
+            | undefined
+);
 const currentBarSubscription = computed(
     () =>
         (page.props as any).currentBarSubscription as
@@ -48,19 +53,44 @@ const mainNavItems = computed<NavItem[]>(() => {
     ];
 
     if (currentBar.value) {
-        items.push(
-            {
+        if (currentBar.value.offers_beer) {
+            items.push({
                 title: 'Catalogue de bières',
                 href: `/bars/${currentBar.value.slug}/beers`,
                 icon: Beer,
-            },
-        );
+            });
+        }
+        if (currentBar.value.offers_wine) {
+            items.push({
+                title: 'Catalogue de vins',
+                href: `/bars/${currentBar.value.slug}/wines`,
+                icon: Wine,
+            });
+        }
+
+        //qr code
+        items.push({
+            title: 'QR Code',
+            href: `/bars/${currentBar.value.slug}/qr-code`,
+            icon: QrCode,
+        });
+
+        items.push({
+            title: 'Statistiques',
+            href: `/bars/${currentBar.value.slug}/stats`,
+            icon: TrendingUp,
+        });
     }
 
     return items;
 });
 
 const footerNavItems: NavItem[] = [
+    {
+        title: 'Gérer mon bar',
+        href: currentBar.value ? `/bars/${currentBar.value.slug}/settings` : '/bars',
+        icon: Settings,
+    },
     {
         title: 'Gerer mon abonnement',
         href: currentBar.value ? `/bars/${currentBar.value.slug}/subscription/portal` : '/bars',
@@ -150,6 +180,7 @@ const startSubscription = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+  
             <NavMain :items="mainNavItems" />
         </SidebarContent>
 
@@ -158,9 +189,8 @@ const startSubscription = () => {
                 v-if="currentBarSubscription && currentBarSubscription.status !== 'active'"
                 class="mx-3 mb-3 rounded-xl border border-amber-100 bg-amber-50/70 px-3 py-3 text-xs font-medium text-amber-900"
             >
-                <div class="flex items-start justify-between gap-2">
+                <div class="flex-row items-start justify-between gap-2">
                     <div class="flex items-start gap-2">
-                        <AlertCircle class="mt-0.5 h-4 w-4 text-amber-700" />
                         <div>
                             <p v-if="currentBarSubscription.status === 'trial'" class="flex flex-wrap items-center gap-1.5">
                                 <span>Essai en cours</span>
@@ -177,7 +207,7 @@ const startSubscription = () => {
                     </div>
                     <button
                         type="button"
-                        class="inline-flex items-center cursor-pointer rounded-lg bg-white px-2.5 py-1 text-[11px] font-semibold text-amber-800 shadow-sm transition-colors hover:bg-amber-100"
+                        class="inline-flex w-full mt-1 justify-center items-center cursor-pointer rounded-lg bg-white px-2.5 py-1 text-[11px] font-semibold text-amber-800 shadow-sm transition-colors hover:bg-amber-100"
                         @click="startSubscription"
                     >
                         Activer

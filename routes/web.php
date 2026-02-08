@@ -11,6 +11,7 @@ use App\Http\Controllers\PublicRecommendationController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\WineController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,6 +21,7 @@ Route::get('/', [MarketingController::class, 'index'])->name('home');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/b/{slug}', [PublicRecommendationController::class, 'show'])->name('public.bar.show');
+Route::get('/b/{slug}/menu', [PublicRecommendationController::class, 'menu'])->name('public.bar.menu');
 Route::post('/b/{slug}/recommend', [PublicRecommendationController::class, 'recommend'])->name('public.bar.recommend');
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
 
@@ -69,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/bars', [BarController::class, 'index'])->name('bars.index');
     Route::post('/bars', [BarController::class, 'store'])->name('bars.store');
     Route::get('/bars/{bar}', [BarController::class, 'show'])->name('bars.show');
+    Route::get('/bars/{bar}/stats', [BarController::class, 'stats'])->name('bars.stats');
     Route::delete('/bars/{bar}', [BarController::class, 'destroy'])->name('bars.destroy');
 
     // Bar settings
@@ -94,6 +97,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/bars/{bar}/beers/{beer}/edit', [BeerController::class, 'edit'])->name('bars.beers.edit');
     Route::put('/bars/{bar}/beers/{beer}', [BeerController::class, 'update'])->name('bars.beers.update');
     Route::delete('/bars/{bar}/beers/{beer}', [BeerController::class, 'destroy'])->name('bars.beers.destroy');
+
+    // Wines
+    Route::get('/bars/{bar}/wines', [WineController::class, 'index'])->name('bars.wines.index');
+    Route::get('/bars/{bar}/wines/template', [WineController::class, 'template'])->name('bars.wines.template');
+    Route::post('/bars/{bar}/wines/import', [WineController::class, 'import'])->name('bars.wines.import');
+    Route::get('/bars/{bar}/wines/create', [WineController::class, 'create'])->name('bars.wines.create');
+    Route::post('/bars/{bar}/wines', [WineController::class, 'store'])->name('bars.wines.store');
+    Route::get('/bars/{bar}/wines/{wine}/edit', [WineController::class, 'edit'])->name('bars.wines.edit');
+    Route::put('/bars/{bar}/wines/{wine}', [WineController::class, 'update'])->name('bars.wines.update');
+    Route::delete('/bars/{bar}/wines/{wine}', [WineController::class, 'destroy'])->name('bars.wines.destroy');
 });
 
 require __DIR__.'/settings.php';

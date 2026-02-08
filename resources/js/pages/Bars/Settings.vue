@@ -16,9 +16,14 @@ interface Props {
         qr_enabled: boolean;
         is_demo: boolean;
         recommendation_questions?: string[] | null;
+        recommendation_questions_wine?: string[] | null;
+        offers_beer: boolean;
+        offers_wine: boolean;
     };
-    recommendationQuestions: Array<{ id: string; label: string; description: string }>;
-    selectedRecommendationQuestions: string[];
+    recommendationQuestionsBeer: Array<{ id: string; label: string; description: string }>;
+    recommendationQuestionsWine: Array<{ id: string; label: string; description: string }>;
+    selectedRecommendationQuestionsBeer: string[];
+    selectedRecommendationQuestionsWine: string[];
 }
 
 const props = defineProps<Props>();
@@ -37,7 +42,10 @@ const form = useForm({
     brand_primary_color: props.bar.brand_primary_color || '#4f46e5',
     welcome_message: props.bar.welcome_message || '',
     qr_enabled: props.bar.qr_enabled,
-    recommendation_questions: [...props.selectedRecommendationQuestions],
+    offers_beer: props.bar.offers_beer ?? true,
+    offers_wine: props.bar.offers_wine ?? false,
+    recommendation_questions: [...props.selectedRecommendationQuestionsBeer],
+    recommendation_questions_wine: [...props.selectedRecommendationQuestionsWine],
 });
 
 const handleLogoChange = (event: Event) => {
@@ -64,16 +72,25 @@ const submit = () => {
     form.transform((data) => ({
         ...data,
         _method: 'PUT',
+        recommendation_questions: data.offers_beer ? data.recommendation_questions : null,
+        recommendation_questions_wine: data.offers_wine ? data.recommendation_questions_wine : null,
     })).post(`/bars/${props.bar.slug}/settings`, {
         forceFormData: true,
     });
 };
 
-const selectedQuestionCount = computed(() => form.recommendation_questions.length);
-const canSelectMoreQuestions = computed(() => selectedQuestionCount.value < 10);
-const hasMinimumQuestions = computed(() => selectedQuestionCount.value >= 3);
-const isQuestionDisabled = (questionId: string) =>
-    !form.recommendation_questions.includes(questionId) && !canSelectMoreQuestions.value;
+const selectedBeerQuestionCount = computed(() => form.recommendation_questions.length);
+const selectedWineQuestionCount = computed(() => form.recommendation_questions_wine.length);
+const canSelectMoreBeerQuestions = computed(() => selectedBeerQuestionCount.value < 10);
+const canSelectMoreWineQuestions = computed(() => selectedWineQuestionCount.value < 10);
+const hasMinimumBeerQuestions = computed(() => !form.offers_beer || selectedBeerQuestionCount.value >= 3);
+const hasMinimumWineQuestions = computed(() => !form.offers_wine || selectedWineQuestionCount.value >= 3);
+const offersAtLeastOne = computed(() => form.offers_beer || form.offers_wine);
+const canSubmit = computed(() => offersAtLeastOne.value && hasMinimumBeerQuestions.value && hasMinimumWineQuestions.value);
+const isBeerQuestionDisabled = (questionId: string) =>
+    !form.recommendation_questions.includes(questionId) && !canSelectMoreBeerQuestions.value;
+const isWineQuestionDisabled = (questionId: string) =>
+    !form.recommendation_questions_wine.includes(questionId) && !canSelectMoreWineQuestions.value;
 </script>
 
 <template>
@@ -229,9 +246,59 @@ const isQuestionDisabled = (questionId: string) =>
                             v-model="form.welcome_message"
                             rows="4"
                             class="mt-4 block w-full rounded-lg border border-amber-200 px-4 py-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200"
-                            placeholder="Bienvenue ! Répondez à quelques questions pour découvrir la bière parfaite pour vous."
+                            placeholder="Bienvenue ! Répondez à quelques questions pour découvrir la boisson parfaite pour vous."
                             :disabled="bar.is_demo"
                         />
+                    </div>
+
+                    <!-- Offerings -->
+                    <div class="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
+                        <div class="mb-4 flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                                <ListChecks class="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900">Catalogue de boissons</h2>
+                                <p class="text-sm text-gray-500">Indiquez ce que vous proposez à vos clients</p>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50/20 px-4 py-3">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900">Bières</p>
+                                    <p class="text-xs text-gray-500">Activer le catalogue de bières</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        v-model="form.offers_beer"
+                                        type="checkbox"
+                                        class="sr-only peer"
+                                        :disabled="bar.is_demo"
+                                    />
+                                    <div class="h-6 w-11 rounded-full bg-gray-200 peer peer-checked:bg-amber-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between rounded-2xl border border-amber-100 bg-amber-50/20 px-4 py-3">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900">Vins</p>
+                                    <p class="text-xs text-gray-500">Activer le catalogue de vins</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        v-model="form.offers_wine"
+                                        type="checkbox"
+                                        class="sr-only peer"
+                                        :disabled="bar.is_demo"
+                                    />
+                                    <div class="h-6 w-11 rounded-full bg-gray-200 peer peer-checked:bg-amber-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <p v-if="!offersAtLeastOne" class="mt-3 text-xs font-medium text-red-600">
+                            Sélectionnez au moins un type de boisson.
+                        </p>
                     </div>
 
                     <!-- Recommendation Questions -->
@@ -242,44 +309,82 @@ const isQuestionDisabled = (questionId: string) =>
                             </div>
                             <div>
                                 <h2 class="text-lg font-semibold text-gray-900">Questions de recommandation</h2>
-                                <p class="text-sm text-gray-500">Sélectionnez entre 3 et 8 questions à poser</p>
+                                <p class="text-sm text-gray-500">Choisissez les questions à poser pour chaque boisson</p>
                             </div>
                         </div>
 
-                        <div class="mb-4 flex flex-wrap items-center gap-3 text-xs font-medium text-amber-800">
-                            <span class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1">
-                                {{ selectedQuestionCount }} / 8 sélectionnées
-                            </span>
-                            <span
-                                v-if="!hasMinimumQuestions"
-                                class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800"
-                            >
-                                Minimum 3 questions
-                            </span>
+                        <div v-if="form.offers_beer" class="mt-6">
+                            <div class="mb-4 flex flex-wrap items-center gap-3 text-xs font-medium text-amber-800">
+                                <span class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1">
+                                    {{ selectedBeerQuestionCount }} / 10 bières
+                                </span>
+                                <span
+                                    v-if="!hasMinimumBeerQuestions"
+                                    class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800"
+                                >
+                                    Minimum 3 questions bière
+                                </span>
+                            </div>
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                <label
+                                    v-for="question in recommendationQuestionsBeer"
+                                    :key="`beer-${question.id}`"
+                                    class="flex cursor-pointer items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/20 p-4 transition hover:border-amber-200"
+                                    :class="{
+                                        'opacity-60 cursor-not-allowed': bar.is_demo || isBeerQuestionDisabled(question.id),
+                                        'border-amber-300 bg-amber-50': form.recommendation_questions.includes(question.id),
+                                    }"
+                                >
+                                    <input
+                                        v-model="form.recommendation_questions"
+                                        type="checkbox"
+                                        :value="question.id"
+                                        class="mt-1 h-4 w-4"
+                                        :disabled="bar.is_demo || isBeerQuestionDisabled(question.id)"
+                                    />
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">{{ question.label }}</p>
+                                        <p class="text-xs text-gray-500">{{ question.description }}</p>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
 
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <label
-                                v-for="question in recommendationQuestions"
-                                :key="question.id"
-                                class="flex cursor-pointer items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/20 p-4 transition hover:border-amber-200"
-                                :class="{
-                                    'opacity-60 cursor-not-allowed': bar.is_demo || isQuestionDisabled(question.id),
-                                    'border-amber-300 bg-amber-50': form.recommendation_questions.includes(question.id),
-                                }"
-                            >
-                                <input
-                                    v-model="form.recommendation_questions"
-                                    type="checkbox"
-                                    :value="question.id"
-                                    class="mt-1 h-4 w-4"
-                                    :disabled="bar.is_demo || isQuestionDisabled(question.id)"
-                                />
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-900">{{ question.label }}</p>
-                                    <p class="text-xs text-gray-500">{{ question.description }}</p>
-                                </div>
-                            </label>
+                        <div v-if="form.offers_wine" class="mt-8">
+                            <div class="mb-4 flex flex-wrap items-center gap-3 text-xs font-medium text-amber-800">
+                                <span class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1">
+                                    {{ selectedWineQuestionCount }} / 7 vins
+                                </span>
+                                <span
+                                    v-if="!hasMinimumWineQuestions"
+                                    class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800"
+                                >
+                                    Minimum 3 questions vin
+                                </span>
+                            </div>
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                <label
+                                    v-for="question in recommendationQuestionsWine"
+                                    :key="`wine-${question.id}`"
+                                    class="flex cursor-pointer items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/20 p-4 transition hover:border-amber-200"
+                                    :class="{
+                                        'opacity-60 cursor-not-allowed': bar.is_demo || isWineQuestionDisabled(question.id),
+                                        'border-amber-300 bg-amber-50': form.recommendation_questions_wine.includes(question.id),
+                                    }"
+                                >
+                                    <input
+                                        v-model="form.recommendation_questions_wine"
+                                        type="checkbox"
+                                        :value="question.id"
+                                        class="mt-1 h-4 w-4"
+                                        :disabled="bar.is_demo || isWineQuestionDisabled(question.id)"
+                                    />
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">{{ question.label }}</p>
+                                        <p class="text-xs text-gray-500">{{ question.description }}</p>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -311,7 +416,7 @@ const isQuestionDisabled = (questionId: string) =>
                         <button
                             type="submit"
                             class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
-                            :disabled="form.processing || !hasMinimumQuestions"
+                            :disabled="form.processing || !canSubmit"
                         >
                             <Save class="h-4 w-4" />
                             <span v-if="form.processing">Enregistrement...</span>

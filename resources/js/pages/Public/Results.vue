@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 interface Beer {
     id: number;
@@ -13,8 +14,20 @@ interface Beer {
     color?: string;
 }
 
+interface Wine {
+    id: number;
+    name: string;
+    color: string;
+    grape?: string | null;
+    region?: string | null;
+    abv_x10: number;
+    description?: string | null;
+    price?: number | null;
+}
+
 interface Recommendation {
-    beer: Beer;
+    beer?: Beer;
+    wine?: Wine;
     explanation: string;
 }
 
@@ -27,6 +40,7 @@ interface Props {
         brand_background_color?: string;
         brand_primary_color?: string;
     };
+    drinkType: 'beer' | 'wine';
     recommendations: Recommendation[];
     preferences: {
         bitterness?: string;
@@ -36,11 +50,14 @@ interface Props {
         format?: string;
         style?: string;
         brewery?: string;
+        grape?: string;
+        region?: string;
         max_price?: number;
     };
 }
 
 const props = defineProps<Props>();
+const isWine = computed(() => props.drinkType === 'wine');
 
 const backgroundColor = props.bar.brand_background_color || '#ffffff';
 const primaryColor = props.bar.brand_primary_color || '#4f46e5';
@@ -78,14 +95,14 @@ const getAbv = (abvX10: number) => {
 
             <div v-if="recommendations.length === 0" class="rounded-lg bg-white p-8 text-center shadow-lg">
                 <p class="text-lg text-gray-600">
-                    Aucune bière ne correspond à vos critères pour le moment.
+                    {{ isWine ? 'Aucun vin ne correspond à vos critères pour le moment.' : 'Aucune bière ne correspond à vos critères pour le moment.' }}
                 </p>
             </div>
 
             <div v-else class="space-y-6">
                 <div
                     v-for="(recommendation, index) in recommendations"
-                    :key="recommendation.beer.id"
+                    :key="isWine ? (recommendation.wine?.id ?? index) : (recommendation.beer?.id ?? index)"
                     class="rounded-lg bg-white p-6 shadow-lg"
                 >
                     <div class="flex items-start justify-between">
@@ -97,27 +114,37 @@ const getAbv = (abvX10: number) => {
                                 >
                                     {{ index + 1 }}
                                 </span>
-                                <h3 class="text-2xl font-bold">{{ recommendation.beer.name }}</h3>
+                                <h3 class="text-2xl font-bold">
+                                    {{ isWine ? recommendation.wine?.name : recommendation.beer?.name }}
+                                </h3>
                             </div>
-                            <p v-if="recommendation.beer.brewery" class="text-lg text-gray-600">
+                            <p v-if="!isWine && recommendation.beer?.brewery" class="text-lg text-gray-600">
                                 {{ recommendation.beer.brewery }}
                             </p>
-                            <p class="text-sm text-gray-500">{{ recommendation.beer.style }}</p>
+                            <p v-if="!isWine" class="text-sm text-gray-500">{{ recommendation.beer?.style }}</p>
+                            <p v-if="isWine && recommendation.wine?.grape" class="text-sm text-gray-500">
+                                Cépage : {{ recommendation.wine.grape }}
+                            </p>
+                            <p v-if="isWine && recommendation.wine?.region" class="text-sm text-gray-500">
+                                Région : {{ recommendation.wine.region }}
+                            </p>
 
                             <div class="mt-4 flex flex-wrap gap-4 text-sm">
                                 <span>
-                                    <strong>ABV:</strong> {{ getAbv(recommendation.beer.abv_x10) }}%
+                                    <strong>ABV:</strong>
+                                    {{ getAbv(isWine ? recommendation.wine?.abv_x10 ?? 0 : recommendation.beer?.abv_x10 ?? 0) }}%
                                 </span>
-                                <span v-if="recommendation.beer.ibu">
+                                <span v-if="!isWine && recommendation.beer?.ibu">
                                     <strong>IBU:</strong> {{ recommendation.beer.ibu }}
                                 </span>
-                                <span v-if="recommendation.beer.price">
-                                    <strong>Prix:</strong> {{ formatPrice(recommendation.beer.price) }}
+                                <span v-if="(isWine ? recommendation.wine?.price : recommendation.beer?.price)">
+                                    <strong>Prix:</strong>
+                                    {{ formatPrice(isWine ? recommendation.wine?.price : recommendation.beer?.price) }}
                                 </span>
                             </div>
 
-                            <p v-if="recommendation.beer.description" class="mt-4 text-gray-700">
-                                {{ recommendation.beer.description }}
+                            <p v-if="isWine ? recommendation.wine?.description : recommendation.beer?.description" class="mt-4 text-gray-700">
+                                {{ isWine ? recommendation.wine?.description : recommendation.beer?.description }}
                             </p>
 
                             <p class="mt-4 text-sm italic text-gray-600">
@@ -129,13 +156,21 @@ const getAbv = (abvX10: number) => {
             </div>
 
             <div class="mt-8 text-center">
-                <a
-                    :href="`/b/${bar.slug}`"
-                    class="inline-block rounded-md px-6 py-3 text-white"
-                    :style="{ backgroundColor: primaryColor }"
-                >
-                    Recommencer
-                </a>
+                <div class="flex flex-col items-center justify-center gap-3 sm:flex-row">
+                    <a
+                        :href="`/b/${bar.slug}`"
+                        class="inline-block rounded-md px-6 py-3 text-white"
+                        :style="{ backgroundColor: primaryColor }"
+                    >
+                        Recommencer
+                    </a>
+                    <a
+                        :href="`/b/${bar.slug}/menu`"
+                        class="inline-block rounded-md border border-gray-200 bg-white px-6 py-3 text-gray-700 transition hover:border-gray-300 hover:bg-gray-50"
+                    >
+                        Voir la carte
+                    </a>
+                </div>
             </div>
         </div>
     </div>

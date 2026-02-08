@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed tags
         $this->call(TagSeeder::class);
+        $this->call(WineTagSeeder::class);
 
         // Seed demo bar and beers
         $this->call(DemoBarSeeder::class);

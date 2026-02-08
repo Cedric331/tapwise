@@ -10,6 +10,12 @@ use Illuminate\Support\Collection;
 
 class BeerRecommendationService
 {
+    private const TOLERANCE_RATIO = 0.10;
+    private const ABV_TOLERANCE_ABS = 0.5;
+    private const PRICE_TOLERANCE_ABS = 0.5;
+    private const NEAR_WEIGHT = 0.5;
+    private const QUALITY_THRESHOLD = 0.9;
+
     /**
      * Get beer recommendations based on user preferences.
      *
@@ -20,6 +26,18 @@ class BeerRecommendationService
     {
         // Get available beers
         $beers = $bar->availableBeers()->with('tags')->get();
+
+        if ($beers->isEmpty()) {
+            return collect();
+        }
+
+        $beers = $beers->filter(fn (Beer $beer) => $this->passesHardLimits($beer, $preferences));
+
+        if ($beers->isEmpty()) {
+            return collect();
+        }
+
+        $beers = $beers->filter(fn (Beer $beer) => $this->passesOverallThreshold($beer, $preferences));
 
         if ($beers->isEmpty()) {
             return collect();
@@ -46,7 +64,7 @@ class BeerRecommendationService
     protected function calculateScore(Beer $beer, array $preferences): float
     {
         $score = 0.0;
-        $activeQuestions = $preferences['_active_questions'] ?? RecommendationQuestions::DEFAULT;
+        $activeQuestions = $preferences['_active_questions'] ?? RecommendationQuestions::DEFAULT_BEER;
         $weights = $this->normalizeWeights($activeQuestions);
 
         // Tag matching (30% weight)
@@ -142,7 +160,7 @@ class BeerRecommendationService
     public function getExplanation(Beer $beer, array $preferences): string
     {
         $reasons = [];
-        $activeQuestions = $preferences['_active_questions'] ?? RecommendationQuestions::DEFAULT;
+        $activeQuestions = $preferences['_active_questions'] ?? RecommendationQuestions::DEFAULT_BEER;
 
         // Check tag matches
         if (in_array('aromas', $activeQuestions, true) && isset($preferences['aromas']) && is_array($preferences['aromas'])) {
@@ -160,6 +178,8 @@ class BeerRecommendationService
             $maxAbv = (float) $preferences['max_abv'];
             if ($beer->abv <= $maxAbv) {
                 $reasons[] = "Taux d'alcool adapté ({$beer->abv}%)";
+            } elseif ($this->isNearMiss($beer->abv, $maxAbv)) {
+                $reasons[] = "Taux d'alcool légèrement au-dessus de votre seuil ({$beer->abv}%)";
             }
         }
 
@@ -210,6 +230,8 @@ class BeerRecommendationService
             $beerPrice = $beer->price / 100;
             if ($beerPrice <= $maxPrice) {
                 $reasons[] = "Prix adapté à votre budget (≤ {$maxPrice}€)";
+            } elseif ($this->isNearMiss($beerPrice, $maxPrice, self::PRICE_TOLERANCE_ABS)) {
+                $reasons[] = "Prix légèrement au-dessus de votre budget ({$beerPrice}€)";
             }
         }
 
@@ -221,12 +243,173 @@ class BeerRecommendationService
     }
 
     /**
+     * Check if beer respects hard limits (with tolerance).
+     */
+    protected function passesHardLimits(Beer $beer, array $preferences): bool
+    {
+        if (isset($preferences['max_abv'])) {
+            $maxAbv = (float) $preferences['max_abv'];
+            $maxAllowedAbv = $this->maxAllowed($maxAbv, self::ABV_TOLERANCE_ABS);
+            if ($maxAbv > 0 && $beer->abv > $maxAllowedAbv) {
+                return false;
+            }
+        }
+
+        if (isset($preferences['max_price'])) {
+            $maxPrice = (float) $preferences['max_price'];
+            if ($maxPrice > 0) {
+                if ($beer->price === null) {
+                    return false;
+                }
+                $beerPrice = $beer->price / 100;
+                $maxAllowedPrice = $this->maxAllowed($maxPrice, self::PRICE_TOLERANCE_ABS);
+                if ($beerPrice > $maxAllowedPrice) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    protected function isNearMiss(float $value, float $max, float $absoluteTolerance = self::ABV_TOLERANCE_ABS): bool
+    {
+        if ($max <= 0) {
+            return false;
+        }
+
+        return $value > $max && $value <= $this->maxAllowed($max, $absoluteTolerance);
+    }
+
+    protected function maxAllowed(float $max, float $absoluteTolerance): float
+    {
+        return $max + max($max * self::TOLERANCE_RATIO, $absoluteTolerance);
+    }
+
+    /**
+     * Ensure the recommendation is close enough overall.
+     */
+    protected function passesOverallThreshold(Beer $beer, array $preferences): bool
+    {
+        $quality = $this->evaluateMatchQuality($beer, $preferences);
+        if ($quality['total'] === 0.0) {
+            return true;
+        }
+
+        if ($quality['strict'] <= 0 && $quality['near'] > 0) {
+            return false;
+        }
+
+        $score = ($quality['strict'] + ($quality['near'] * self::NEAR_WEIGHT)) / $quality['total'];
+
+        return $score >= self::QUALITY_THRESHOLD;
+    }
+
+    /**
+     * @return array{strict:float, near:float, total:float}
+     */
+    protected function evaluateMatchQuality(Beer $beer, array $preferences): array
+    {
+        $strict = 0.0;
+        $near = 0.0;
+        $total = 0.0;
+        $activeQuestions = $preferences['_active_questions'] ?? RecommendationQuestions::DEFAULT_BEER;
+        $weights = $this->normalizeWeights($activeQuestions);
+
+        if (in_array('aromas', $activeQuestions, true) && isset($preferences['aromas']) && is_array($preferences['aromas'])) {
+            $weight = $weights['aromas'] ?? 0.0;
+            $total += $weight;
+            $beerTagSlugs = $beer->tags->pluck('slug')->toArray();
+            if (count(array_intersect($preferences['aromas'], $beerTagSlugs)) > 0) {
+                $strict += $weight;
+            }
+        }
+
+        if (in_array('max_abv', $activeQuestions, true) && isset($preferences['max_abv'])) {
+            $weight = $weights['max_abv'] ?? 0.0;
+            $total += $weight;
+            $maxAbv = (float) $preferences['max_abv'];
+            if ($beer->abv <= $maxAbv) {
+                $strict += $weight;
+            } elseif ($this->isNearMiss($beer->abv, $maxAbv, self::ABV_TOLERANCE_ABS)) {
+                $near += $weight;
+            }
+        }
+
+        if (in_array('bitterness', $activeQuestions, true) && isset($preferences['bitterness']) && $beer->ibu !== null) {
+            $weight = $weights['bitterness'] ?? 0.0;
+            $total += $weight;
+            $bitterness = $preferences['bitterness'];
+            $ibu = $beer->ibu;
+            if (($bitterness === 'faible' && $ibu <= 25) ||
+                ($bitterness === 'moyenne' && $ibu > 25 && $ibu <= 50) ||
+                ($bitterness === 'forte' && $ibu > 50)) {
+                $strict += $weight;
+            }
+        }
+
+        if (in_array('format', $activeQuestions, true) && isset($preferences['format'])) {
+            $weight = $weights['format'] ?? 0.0;
+            $total += $weight;
+            $format = $preferences['format'];
+            if (($format === 'pression' && $beer->is_on_tap) || ($format === 'bouteille' && ! $beer->is_on_tap)) {
+                $strict += $weight;
+            }
+        }
+
+        if (in_array('color', $activeQuestions, true) && isset($preferences['color']) && is_array($preferences['color'])) {
+            $weight = $weights['color'] ?? 0.0;
+            $total += $weight;
+            $beerColor = $beer->color instanceof BeerColor ? $beer->color->value : (string) $beer->color;
+            if (in_array($beerColor, $preferences['color'], true)) {
+                $strict += $weight;
+            }
+        }
+
+        if (in_array('style', $activeQuestions, true) && ! empty($preferences['style']) && $preferences['style'] !== 'any') {
+            $weight = $weights['style'] ?? 0.0;
+            $total += $weight;
+            if ($beer->style && strcasecmp($beer->style, (string) $preferences['style']) === 0) {
+                $strict += $weight;
+            }
+        }
+
+        if (in_array('brewery', $activeQuestions, true) && ! empty($preferences['brewery']) && $preferences['brewery'] !== 'any') {
+            $weight = $weights['brewery'] ?? 0.0;
+            $total += $weight;
+            if ($beer->brewery && strcasecmp($beer->brewery, (string) $preferences['brewery']) === 0) {
+                $strict += $weight;
+            }
+        }
+
+        if (in_array('max_price', $activeQuestions, true) && isset($preferences['max_price'])) {
+            $weight = $weights['max_price'] ?? 0.0;
+            $total += $weight;
+            $maxPrice = (float) $preferences['max_price'];
+            if ($beer->price !== null) {
+                $beerPrice = $beer->price / 100;
+                if ($beerPrice <= $maxPrice) {
+                    $strict += $weight;
+                } elseif ($this->isNearMiss($beerPrice, $maxPrice, self::PRICE_TOLERANCE_ABS)) {
+                    $near += $weight;
+                }
+            }
+        }
+
+        return [
+            'strict' => $strict,
+            'near' => $near,
+            'total' => $total,
+        ];
+    }
+
+    /**
      * @param  array<int, string>  $activeQuestions
      * @return array<string, float>
      */
     protected function normalizeWeights(array $activeQuestions): array
     {
-        $baseWeights = RecommendationQuestions::weights();
+        $baseWeights = RecommendationQuestions::weights('beer');
         $activeWeights = array_intersect_key($baseWeights, array_flip($activeQuestions));
 
         $total = array_sum($activeWeights);

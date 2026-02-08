@@ -21,9 +21,15 @@ class BarSettingsController extends Controller
 
         return Inertia::render('Bars/Settings', [
             'bar' => $bar,
-            'recommendationQuestions' => RecommendationQuestions::all(),
-            'selectedRecommendationQuestions' => RecommendationQuestions::normalizeSelected(
-                $bar->recommendation_questions
+            'recommendationQuestionsBeer' => RecommendationQuestions::all('beer'),
+            'recommendationQuestionsWine' => RecommendationQuestions::all('wine'),
+            'selectedRecommendationQuestionsBeer' => RecommendationQuestions::normalizeSelected(
+                $bar->recommendation_questions,
+                'beer'
+            ),
+            'selectedRecommendationQuestionsWine' => RecommendationQuestions::normalizeSelected(
+                $bar->recommendation_questions_wine,
+                'wine'
             ),
         ]);
     }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface Props {
     bar: {
@@ -17,41 +17,66 @@ interface Props {
     styleOptions: string[];
     breweryOptions: string[];
     maxPrice: number | null;
-    questionOptions: Array<{ id: string; label: string; description: string }>;
-    selectedQuestions: string[];
+    questionOptionsBeer: Array<{ id: string; label: string; description: string }>;
+    questionOptionsWine: Array<{ id: string; label: string; description: string }>;
+    selectedQuestionsBeer: string[];
+    selectedQuestionsWine: string[];
+    wineColorOptions: Record<string, string>;
+    wineAromaOptions: Array<{ value: string; label: string }>;
+    grapeOptions: string[];
+    regionOptions: string[];
+    maxWinePrice: number | null;
+    foodPairingOptions: Array<{ id: string; label: string }>;
+    availableDrinkTypes: Array<'beer' | 'wine'>;
 }
 
 const props = defineProps<Props>();
 
 const currentStep = ref(0);
-const hasQuestionData = (questionId: string) => {
+const defaultDrinkType = props.availableDrinkTypes[0] ?? 'beer';
+
+const hasQuestionData = (questionId: string, drinkType: 'beer' | 'wine') => {
     switch (questionId) {
         case 'color':
-            return Object.keys(props.colorOptions || {}).length > 0;
+            return drinkType === 'wine'
+                ? Object.keys(props.wineColorOptions || {}).length > 0
+                : Object.keys(props.colorOptions || {}).length > 0;
         case 'aromas':
-            return (props.aromaOptions || []).length > 0;
+            return drinkType === 'wine'
+                ? (props.wineAromaOptions || []).length > 0
+                : (props.aromaOptions || []).length > 0;
         case 'style':
             return (props.styleOptions || []).length > 0;
         case 'brewery':
             return (props.breweryOptions || []).length > 0;
+        case 'grape':
+            return (props.grapeOptions || []).length > 0;
+        case 'region':
+            return (props.regionOptions || []).length > 0;
+        case 'food':
+            return (props.foodPairingOptions || []).length > 0;
         case 'max_price':
-            return (props.maxPrice ?? 0) > 0;
+            return drinkType === 'wine' ? (props.maxWinePrice ?? 0) > 0 : (props.maxPrice ?? 0) > 0;
         default:
             return true;
     }
 };
 
-const questionOrder = computed(() => props.selectedQuestions.filter(hasQuestionData));
-const totalSteps = computed(() => questionOrder.value.length);
-const currentQuestionId = computed(() => questionOrder.value[currentStep.value]);
+const showDrinkTypeStep = computed(() => props.availableDrinkTypes.length > 1);
 
-const maxPriceEuros = computed(() => {
+const maxPriceEurosBeer = computed(() => {
     const max = props.maxPrice ?? 0;
+    const maxEuros = max > 0 ? Math.ceil(max / 100) : 12;
+    return Math.max(maxEuros, 5);
+});
+const maxPriceEurosWine = computed(() => {
+    const max = props.maxWinePrice ?? 0;
     const maxEuros = max > 0 ? Math.ceil(max / 100) : 12;
     return Math.max(maxEuros, 5);
 });
 
 const form = useForm({
+    drink_type: defaultDrinkType,
     bitterness: '',
     color: [] as string[],
     aromas: [] as string[],
@@ -59,7 +84,64 @@ const form = useForm({
     format: '',
     style: 'any',
     brewery: 'any',
-    max_price: maxPriceEuros.value,
+    grape: 'any',
+    region: 'any',
+    food_pairings: [] as string[],
+    max_price: defaultDrinkType === 'wine' ? maxPriceEurosWine.value : maxPriceEurosBeer.value,
+});
+
+const currentDrinkType = computed(() => (form.drink_type === 'wine' ? 'wine' : 'beer'));
+const currentMaxPriceEuros = computed(() =>
+    currentDrinkType.value === 'wine' ? maxPriceEurosWine.value : maxPriceEurosBeer.value
+);
+const colorOptionsForDrink = computed(() =>
+    currentDrinkType.value === 'wine' ? props.wineColorOptions : props.colorOptions
+);
+const aromaOptionsForDrink = computed(() =>
+    currentDrinkType.value === 'wine' ? props.wineAromaOptions : props.aromaOptions
+);
+const colorQuestionTitle = computed(() =>
+    currentDrinkType.value === 'wine'
+        ? 'Quelle couleur de vin préférez-vous ?'
+        : 'Quelle couleur de bière préférez-vous ?'
+);
+const aromaQuestionTitle = computed(() =>
+    currentDrinkType.value === 'wine'
+        ? 'Quels arômes de vin vous plaisent ?'
+        : 'Quels arômes vous plaisent ?'
+);
+const maxPriceQuestionTitle = computed(() =>
+    currentDrinkType.value === 'wine' ? 'Budget maximum pour un vin' : 'Budget maximum par bière'
+);
+const maxAbvLimit = computed(() => (currentDrinkType.value === 'wine' ? 25 : 15));
+
+const selectedQuestionsForDrink = computed(() =>
+    currentDrinkType.value === 'wine' ? props.selectedQuestionsWine : props.selectedQuestionsBeer
+);
+const questionOrder = computed(() => {
+    const base = selectedQuestionsForDrink.value.filter((id) => hasQuestionData(id, currentDrinkType.value));
+    return showDrinkTypeStep.value ? ['drink_type', ...base] : base;
+});
+const totalSteps = computed(() => questionOrder.value.length);
+const currentQuestionId = computed(() => questionOrder.value[currentStep.value]);
+
+watch(currentDrinkType, () => {
+    form.max_price = currentMaxPriceEuros.value;
+    form.color = [];
+    form.aromas = [];
+    form.bitterness = '';
+    form.format = '';
+    form.style = 'any';
+    form.brewery = 'any';
+    form.grape = 'any';
+    form.region = 'any';
+    form.food_pairings = [];
+});
+
+watch(questionOrder, (newOrder) => {
+    if (currentStep.value > newOrder.length - 1) {
+        currentStep.value = Math.max(newOrder.length - 1, 0);
+    }
 });
 
 const bitternessOptions = [
@@ -118,14 +200,22 @@ const logoSrc = computed(() => {
 
 const isStepValid = (questionId?: string) => {
     switch (questionId) {
+        case 'drink_type':
+            return !!form.drink_type;
         case 'bitterness':
             return !!form.bitterness;
         case 'color':
             return form.color.length > 0;
         case 'aromas':
             return form.aromas.length > 0;
+        case 'food':
+            return form.food_pairings.length > 0;
         case 'format':
             return !!form.format;
+        case 'grape':
+            return !!form.grape;
+        case 'region':
+            return !!form.region;
         default:
             return true;
     }
@@ -188,6 +278,39 @@ const isStepValid = (questionId?: string) => {
 
             <!-- Form steps -->
             <div class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
+                <!-- Step 0: Drink type -->
+                <div v-if="currentQuestionId === 'drink_type'">
+                    <div class="mb-6 space-y-2">
+                        <h2 class="text-2xl font-semibold tracking-tight">Que souhaitez-vous consommer ?</h2>
+                        <p class="text-sm text-gray-500">Choisissez la boisson qui vous fait envie.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <label
+                            v-for="option in availableDrinkTypes"
+                            :key="option"
+                            class="group flex cursor-pointer items-center justify-between rounded-2xl border p-4 transition"
+                            :class="form.drink_type === option ? 'border-indigo-600 bg-indigo-50 shadow-sm' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
+                        >
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold"
+                                    :class="form.drink_type === option ? 'border-indigo-600 bg-white text-indigo-600' : 'border-gray-200 text-gray-500 group-hover:text-gray-700'"
+                                >
+                                    {{ option === 'wine' ? 'V' : 'B' }}
+                                </span>
+                                <span class="text-lg font-medium">{{ option === 'wine' ? 'Vin' : 'Bière' }}</span>
+                            </div>
+                            <input
+                                v-model="form.drink_type"
+                                type="radio"
+                                :value="option"
+                                class="h-4 w-4"
+                                :style="{ accentColor: primaryColor }"
+                            />
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Step 1: Bitterness -->
                 <div v-if="currentQuestionId === 'bitterness'">
                     <div class="mb-6 space-y-2">
@@ -224,12 +347,12 @@ const isStepValid = (questionId?: string) => {
                 <!-- Step 2: Color -->
                 <div v-if="currentQuestionId === 'color'">
                     <div class="mb-6 space-y-2">
-                        <h2 class="text-2xl font-semibold tracking-tight">Quelle couleur de bière préférez-vous ?</h2>
+                        <h2 class="text-2xl font-semibold tracking-tight">{{ colorQuestionTitle }}</h2>
                         <p class="text-sm text-gray-500">Sélectionnez une ou plusieurs couleurs.</p>
                     </div>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <button
-                            v-for="(label, value) in colorOptions"
+                            v-for="(label, value) in colorOptionsForDrink"
                             :key="value"
                             type="button"
                             class="flex items-center justify-between rounded-2xl border p-4 text-left transition"
@@ -251,12 +374,12 @@ const isStepValid = (questionId?: string) => {
                 <!-- Step 3: Aromas -->
                 <div v-if="currentQuestionId === 'aromas'">
                     <div class="mb-6 space-y-2">
-                        <h2 class="text-2xl font-semibold tracking-tight">Quels arômes vous plaisent ?</h2>
+                        <h2 class="text-2xl font-semibold tracking-tight">{{ aromaQuestionTitle }}</h2>
                         <p class="text-sm text-gray-500">Sélectionnez un ou plusieurs arômes.</p>
                     </div>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         <button
-                            v-for="option in aromaOptions"
+                            v-for="option in aromaOptionsForDrink"
                             :key="option.value"
                             type="button"
                             class="flex items-center justify-between rounded-2xl border p-4 text-left transition"
@@ -275,6 +398,39 @@ const isStepValid = (questionId?: string) => {
                     </div>
                 </div>
 
+                <div v-if="currentQuestionId === 'food'">
+                    <div class="mb-6 space-y-2">
+                        <h2 class="text-2xl font-semibold tracking-tight">Qu'est-ce que vous mangez ?</h2>
+                        <p class="text-sm text-gray-500">Choisissez un ou plusieurs plats.</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <button
+                            v-for="option in foodPairingOptions"
+                            :key="option.id"
+                            type="button"
+                            class="flex items-center justify-between rounded-2xl border p-4 text-left transition"
+                            :class="form.food_pairings.includes(option.id) ? 'border-indigo-600 bg-indigo-50 shadow-sm' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
+                            :style="form.food_pairings.includes(option.id) ? { borderColor: primaryColor, backgroundColor: `${primaryColor}15` } : {}"
+                            @click="() => {
+                                const index = form.food_pairings.indexOf(option.id);
+                                if (index > -1) {
+                                    form.food_pairings.splice(index, 1);
+                                } else {
+                                    form.food_pairings.push(option.id);
+                                }
+                            }"
+                        >
+                            <span class="text-base font-medium">{{ option.label }}</span>
+                            <span
+                                class="ml-3 inline-flex h-6 w-6 items-center justify-center rounded-full border text-xs"
+                                :class="form.food_pairings.includes(option.id) ? 'border-indigo-600 text-indigo-600' : 'border-gray-200 text-gray-400'"
+                            >
+                                ✓
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Step 4: Max ABV -->
                 <div v-if="currentQuestionId === 'max_abv'">
                     <div class="mb-6 space-y-2">
@@ -286,7 +442,7 @@ const isStepValid = (questionId?: string) => {
                             v-model.number="form.max_abv"
                             type="range"
                             min="0"
-                            max="15"
+                            :max="maxAbvLimit"
                             step="0.5"
                             class="w-full"
                             :style="{ accentColor: primaryColor }"
@@ -364,9 +520,41 @@ const isStepValid = (questionId?: string) => {
                     </select>
                 </div>
 
+                <div v-if="currentQuestionId === 'grape'">
+                    <div class="mb-6 space-y-2">
+                        <h2 class="text-2xl font-semibold tracking-tight">Un cépage en particulier ?</h2>
+                        <p class="text-sm text-gray-500">Choisissez un cépage ou laissez "Peu importe".</p>
+                    </div>
+                    <select
+                        v-model="form.grape"
+                        class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    >
+                        <option value="any">Peu importe</option>
+                        <option v-for="grape in grapeOptions" :key="grape" :value="grape">
+                            {{ grape }}
+                        </option>
+                    </select>
+                </div>
+
+                <div v-if="currentQuestionId === 'region'">
+                    <div class="mb-6 space-y-2">
+                        <h2 class="text-2xl font-semibold tracking-tight">Une région ou appellation ?</h2>
+                        <p class="text-sm text-gray-500">Choisissez une région ou laissez "Peu importe".</p>
+                    </div>
+                    <select
+                        v-model="form.region"
+                        class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    >
+                        <option value="any">Peu importe</option>
+                        <option v-for="region in regionOptions" :key="region" :value="region">
+                            {{ region }}
+                        </option>
+                    </select>
+                </div>
+
                 <div v-if="currentQuestionId === 'max_price'">
                     <div class="mb-6 space-y-2">
-                        <h2 class="text-2xl font-semibold tracking-tight">Budget maximum par bière</h2>
+                        <h2 class="text-2xl font-semibold tracking-tight">{{ maxPriceQuestionTitle }}</h2>
                         <p class="text-sm text-gray-500">Glissez pour définir votre budget.</p>
                     </div>
                     <div class="space-y-5">
@@ -374,7 +562,7 @@ const isStepValid = (questionId?: string) => {
                             v-model.number="form.max_price"
                             type="range"
                             min="0"
-                            :max="maxPriceEuros"
+                            :max="currentMaxPriceEuros"
                             step="0.5"
                             class="w-full"
                             :style="{ accentColor: primaryColor }"

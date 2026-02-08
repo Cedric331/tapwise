@@ -391,7 +391,6 @@ const buildMappingPayload = () => {
                         <div>
                             <p class="text-sm font-medium text-amber-800">Catalogue</p>
                             <h1 class="mt-3 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">Catalogue de bières</h1>
-                            <p class="mt-3 text-lg text-gray-600">{{ bar.name }}</p>
                             <p class="mt-2 text-sm text-gray-500">
                                 Affinez votre sélection pour des recommandations toujours plus pertinentes.
                             </p>
@@ -545,7 +544,7 @@ const buildMappingPayload = () => {
                             <button
                                 type="submit"
                                 class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-800 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
-                                :disabled="importForm.processing || !canImport"
+                                :disabled="importForm.processing"
                             >
                                 <Upload class="h-4 w-4" />
                                 <span v-if="importForm.processing">Import en cours...</span>
